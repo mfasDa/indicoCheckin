@@ -11,13 +11,18 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
 import indico.checkin.core.api.IndicoAPIConnector;
+import indico.checkin.core.api.RegistrantListFetchingException;
 import indico.checkin.core.data.IndicoEventRegistrantList;
+import indico.checkin.core.data.IndicoParsedETicket;
 import indico.checkin.core.data.IndicoRegistrant;
 
 import javax.swing.JFrame;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+
+import com.github.sarxos.webcam.Webcam;
+import com.github.sarxos.webcam.WebcamPanel;
 
 public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, WindowListener {
 	/**
@@ -32,9 +37,13 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 	private JButton checkinButton;
 	private JButton cancelButton;
 	
+	private InfoPanel infopanel;
+	
 	// Data
 	private IndicoEventRegistrantList registrants;
+	private IndicoParsedETicket eticket;
 	private IndicoRegistrant current;
+	private IndicoBarcodeHandler barcodeHandler;
 	
 	// connection to indico server
 	private IndicoAPIConnector indicoConnection;
@@ -47,6 +56,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		registrants = null;
 		current = null;
 		indicoConnection = new IndicoAPIConnector();
+		barcodeHandler = new IndicoBarcodeHandler();
 	}
 
 	
@@ -55,12 +65,11 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		 * Create main window
 		 */
 		this.setTitle("Indico checkin");
-		this.setLayout(new FlowLayout());
+		this.setLayout(new BorderLayout());
 		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		this.addWindowListener(this);
 		
-//		JPanel infopanel = new JPanel();
-		
+		infopanel = new InfoPanel();
 		
 		// Define Panel for admin buttons
 		JPanel userButtonPanel = new JPanel(new GridBagLayout());
@@ -156,7 +165,8 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		buttonPanel.add(userButtonPanel);
 		buttonPanel.add(processPanel);
 		
-		this.getContentPane().add(buttonPanel);
+		this.getContentPane().add(infopanel, BorderLayout.NORTH);
+		this.getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 		this.pack();
 		this.setVisible(true);
 	}
@@ -187,6 +197,8 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 			showApiInfoDialog();
 		} else if(arg0.getActionCommand().equals("exit"))
 			handleExit();
+		else if(arg0.getActionCommand().equals("newUser"))
+			newUserClicked();
 	}
 
 	@Override
@@ -273,7 +285,20 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		/*
 		 * Handle click to newUserButton
 		 */
-		
+		this.changePaymentButton.setEnabled(false);
+		this.checkinButton.setEnabled(false);
+		this.generateTicketButton.setEnabled(false);
+		eticket = null;
+		current = null;
+		Thread t = new Thread(){
+			@Override
+			public void run(){
+				eticket = barcodeHandler.handleBarcode();
+				if(eticket != null)
+					handleEticketParsed();
+			}
+		};
+		t.start();
 	}
 	
 	public void changePaymentClicked(){
@@ -292,6 +317,30 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		/*
 		 * Handle Click to checkin button
 		 */
+	}
+	
+	public void handleEticketParsed(){
+		/*
+		 * Ticket was parsed
+		 */
+		if(this.registrants == null){
+			try {
+				registrants = this.indicoConnection.FetchRegistrantList(eticket);
+				current = registrants.FindRegistrant(eticket);
+				if(current != null){
+					JOptionPane.showMessageDialog(this, String.format("ETicket read successfully: %s", current.getFullName()));				
+					this.generateTicketButton.setEnabled(true);
+					this.changePaymentButton.setEnabled(true);
+				} else {
+					JOptionPane.showMessageDialog(this, "ETicket read successfully, but registrant not found");
+				}
+			} catch (RegistrantListFetchingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				JOptionPane.showMessageDialog(this, "ETicket read successfully, but connection failed");
+				
+			}
+		}
 	}
 
 }
