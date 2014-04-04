@@ -50,6 +50,7 @@ public class IndicoBarcodeHandler {
 		if(hasRead){
 			// Barcode parsed successfully
 			IndicoJSONBarcodeParser parser = new IndicoJSONBarcodeParser();
+			System.out.printf("Ticket: %s\n", barcode);
 			try{
 				eticket = parser.parse(barcode);
 			} catch (ETicketDecodingException e){

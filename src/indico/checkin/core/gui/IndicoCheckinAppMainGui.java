@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -20,9 +19,6 @@ import javax.swing.JFrame;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-
-import com.github.sarxos.webcam.Webcam;
-import com.github.sarxos.webcam.WebcamPanel;
 
 public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, WindowListener {
 	/**
@@ -48,6 +44,8 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 	private IndicoRegistrant current;
 	private IndicoBarcodeHandler barcodeHandler;
 	
+	private boolean isLoggedIn;
+	
 	// connection to indico server
 	private IndicoAPIConnector indicoConnection;
 	
@@ -61,6 +59,8 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		indicoConnection = new IndicoAPIConnector();
 		barcodeHandler = new IndicoBarcodeHandler();
 		newregthread = null;
+		
+		isLoggedIn = false;
 	}
 
 	
@@ -203,6 +203,9 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 			handleExit();
 		else if(arg0.getActionCommand().equals("newUser"))
 			newUserClicked();
+		else if(arg0.getActionCommand().equals("cancel")){
+			handleCancel();
+		}
 	}
 
 	@Override
@@ -276,6 +279,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 			this.newUserButton.setEnabled(true);
 			this.loginbutton.setEnabled(false);
 			this.apiinfobutton.setEnabled(true);
+			this.isLoggedIn = true;
 		}
 	}
 	
@@ -293,6 +297,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		/*
 		 * Handle click to newUserButton
 		 */
+		this.newUserButton.setEnabled(false);
 		this.changePaymentButton.setEnabled(false);
 		this.checkinButton.setEnabled(false);
 		this.generateTicketButton.setEnabled(false);
@@ -351,11 +356,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 				
 			}
 		}
-		if(newregthread != null){
-			// Shut down thread for barcode scanning
-			newregthread.interrupt();
-		}
-
+		finishBarcodeThread();
 	}
 	
 	public void handleParserFailure(){
@@ -364,10 +365,33 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		 * Kill thread and show an error message
 		 */
 		JOptionPane.showMessageDialog(this, "Failed scanning barcode");
+		finishBarcodeThread();
+	}
+	
+	public void handleCancel(){
+		/*
+		 * User pressed cancel:
+		 * 
+		 * Finish registrant thread, deactivate user buttons, and remove link for current user
+		 * 
+		 */
+		this.current = null;
+		
+		this.generateTicketButton.setEnabled(false);
+		this.checkinButton.setEnabled(false);
+		this.changePaymentButton.setEnabled(false);
+		
+		finishBarcodeThread();
+	}
+
+	public void finishBarcodeThread(){
+		/*
+		 * enable new user button
+		 */
+		if(isLoggedIn) this.newUserButton.setEnabled(true);
 		if(newregthread != null){
 			newregthread.interrupt();
 			newregthread = null;
 		}
 	}
-
 }
