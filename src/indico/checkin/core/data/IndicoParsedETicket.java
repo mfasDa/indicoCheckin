@@ -4,10 +4,15 @@ public class IndicoParsedETicket {
 	private String registrantID;
 	private String eventID;
 	private String secret;
+	private String auth_key;
 	private String url;
 	
 	public IndicoParsedETicket(){
-		
+		registrantID = "";
+		eventID = "";
+		secret = "";
+		setAuthKey("");
+		url = "";
 	}
 	
 	public long getRegistrantID() {
@@ -38,5 +43,13 @@ public class IndicoParsedETicket {
 	@Override
 	public String toString(){
 		return String.format("Registrant: %s\nEvent: %s\nBase URL: %s\nSecret: %s", this.registrantID, this.eventID, this.url, this.secret);
+	}
+
+	public String getAuthKey() {
+		return auth_key;
+	}
+
+	public void setAuthKey(String auth_key) {
+		this.auth_key = auth_key;
 	}
 }

@@ -57,8 +57,10 @@ public class IndicoJSONBarcodeParser {
 						String myurl = (String)en.getValue();
 						myurl.replace("\\", "");
 						reg.setUrl(myurl);
-					} else if(key.equals("secret")){
+					} else if(key.equals("secret") || key.equals("checkin_secret")){
 						reg.setSecret((String)en.getValue());
+					} else if(key.equals("auth_key")){
+						reg.setAuthKey((String)en.getValue());
 					} else {
 						StringBuilder sb = new StringBuilder("Key ");
 						sb.append(key);
