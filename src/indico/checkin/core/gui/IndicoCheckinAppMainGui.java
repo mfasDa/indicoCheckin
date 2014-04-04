@@ -39,6 +39,9 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 	
 	private InfoPanel infopanel;
 	
+	// Thread for new registrant
+	private Thread newregthread;
+	
 	// Data
 	private IndicoEventRegistrantList registrants;
 	private IndicoParsedETicket eticket;
@@ -57,6 +60,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		current = null;
 		indicoConnection = new IndicoAPIConnector();
 		barcodeHandler = new IndicoBarcodeHandler();
+		newregthread = null;
 	}
 
 	
@@ -250,6 +254,10 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		/*
 		 * show exit dialog
 		 */
+		if(newregthread != null){
+			// Shut down new registrant thread before exiting the program
+			newregthread.interrupt();
+		}
 		if(JOptionPane.showConfirmDialog(null, "Close Program?") == JOptionPane.OK_OPTION)
 			this.dispose();
 	}
@@ -290,15 +298,17 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		this.generateTicketButton.setEnabled(false);
 		eticket = null;
 		current = null;
-		Thread t = new Thread(){
+		newregthread = new Thread(){
 			@Override
 			public void run(){
 				eticket = barcodeHandler.handleBarcode();
 				if(eticket != null)
 					handleEticketParsed();
+				else
+					handleParserFailure();
 			}
 		};
-		t.start();
+		newregthread.start();
 	}
 	
 	public void changePaymentClicked(){
@@ -340,6 +350,23 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 				JOptionPane.showMessageDialog(this, "ETicket read successfully, but connection failed");
 				
 			}
+		}
+		if(newregthread != null){
+			// Shut down thread for barcode scanning
+			newregthread.interrupt();
+		}
+
+	}
+	
+	public void handleParserFailure(){
+		/*
+		 * Parsing was not successfull:
+		 * Kill thread and show an error message
+		 */
+		JOptionPane.showMessageDialog(this, "Failed scanning barcode");
+		if(newregthread != null){
+			newregthread.interrupt();
+			newregthread = null;
 		}
 	}
 

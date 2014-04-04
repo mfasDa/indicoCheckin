@@ -31,19 +31,30 @@ public class IndicoBarcodeHandler {
 		Webcam webcam = Webcam.getDefault();
 		boolean hasRead = false;
 		webcam.open();
+		long timestart = System.currentTimeMillis();
 		while(!hasRead){
 			BufferedImage img = webcam.getImage();
 			if(ProcessImage(img)){
 				hasRead = true;
+			} else{
+				// stop test after 30 seconds
+				long timenow = System.currentTimeMillis();
+				if(timenow - timestart > 5000){
+					hasRead = false;
+					break;
+				}
 			}
 		}
 		
-		IndicoJSONBarcodeParser parser = new IndicoJSONBarcodeParser();
 		IndicoParsedETicket eticket = null;
-		try{
-			eticket = parser.parse(barcode);
-		} catch (ETicketDecodingException e){
-			e.printStackTrace();
+		if(hasRead){
+			// Barcode parsed successfully
+			IndicoJSONBarcodeParser parser = new IndicoJSONBarcodeParser();
+			try{
+				eticket = parser.parse(barcode);
+			} catch (ETicketDecodingException e){
+				e.printStackTrace();
+			}
 		}
 		return eticket;
 	}
