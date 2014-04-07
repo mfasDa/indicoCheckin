@@ -130,6 +130,13 @@ public class IndicoRegistrant {
 		return this.getPersonalInformation("address");
 	}
 	
+	public boolean hasPaid(){
+		/*
+		 * check whether registrant has already payed
+		 */
+		return this.getRegistrantInformation("paid").equals("true");
+	}
+
 	public boolean isTicketValid(IndicoParsedETicket ticket){
 		/*
 		 * check whether ticket is valid:

@@ -71,7 +71,7 @@ public class IndicoAPIConnector {
 	
 	private String CreateURLRegistrantList() throws EncryptionException {
 		/*
-		 * Build URL for registrant GET request
+		 * Build URL for registrant list GET request
 		 */
 		if(this.eventID < 0 || this.server.isEmpty()) 
 			throw new EncryptionException("Indico server or Event ID not specified");
@@ -89,6 +89,29 @@ public class IndicoAPIConnector {
 		apiUrl.append(String.format("&signature=%s", signature));
 		
 		return apiUrl.toString();
+	}
+	
+	private String CreateURLRegistrant(IndicoParsedETicket ticket) throws EncryptionException{
+		/*
+		 * Build URL for registrant GET request
+		 */
+		if(this.eventID < 0 || this.server.isEmpty()) 
+			throw new EncryptionException("Indico server or Event ID not specified");
+		if(this.apikey.isEmpty() || this.apisecret.isEmpty()) 
+			throw new EncryptionException("API key or secret not specified");
+		Long timestamp = new Long(System.currentTimeMillis()/1000);
+		String contenturl = String.format("/export/event/%d/registrant/%d.json?ak=%s&authl_key=%s&details=full&timestamp=%d", this.getEventID(), ticket.getRegistrantID(), this.apikey, ticket.getAuthKey(), timestamp);
+		
+		// Priduce signature
+		String signature = createSignature(contenturl, this.apisecret);
+		
+		// Put together
+		StringBuilder apiUrl = new StringBuilder(this.getServer());
+		apiUrl.append(contenturl);
+		apiUrl.append(String.format("&signature=%s", signature));
+		
+		return apiUrl.toString();
+		
 	}
 
 	private String createSignature(String signatureString, String secretKey){
@@ -126,6 +149,39 @@ public class IndicoAPIConnector {
 		 */
 		IndicoRegistrant reg = new IndicoRegistrant();
 		return reg;
+	}
+	
+	public void FetchFullRegistrantInformation(IndicoRegistrant reg, IndicoParsedETicket ticket){
+		/*
+		 * Fetch full registrant information
+		 */
+		String jsonresult = "";
+		try{
+			String myurl = CreateURLRegistrant(ticket);
+			System.out.printf("URL: %s\n", myurl);
+			URL indicourl = new URL(myurl);
+			
+			BufferedReader w  = new BufferedReader(new InputStreamReader(new BufferedInputStream(indicourl.openStream())));
+			StringBuilder sb = new StringBuilder();
+			for(String line; (line = w.readLine()) != null;){
+				sb.append(line);
+				jsonresult = sb.toString();
+			}
+			// TODO: remove output after finish debugging 
+			System.out.println("Final string:");
+			System.out.println(sb.toString());
+		} catch(EncryptionException e){
+			
+		} catch(MalformedURLException e){
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		// Add values to the registrant which are not yet set
+		IndicoJSONReglistParser parser = new IndicoJSONReglistParser();
+		parser.parseFullRegistrantInformation(reg, jsonresult);
 	}
 
 	public IndicoEventRegistrantList FetchRegistrantList() throws RegistrantListFetchingException{

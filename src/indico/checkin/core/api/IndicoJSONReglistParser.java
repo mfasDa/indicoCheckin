@@ -77,4 +77,50 @@ public class IndicoJSONReglistParser {
 		}
 		return reg;
 	}
+	
+	public void parseFullRegistrantInformation(IndicoRegistrant reg, String jsonstring){
+		/*
+		 * Parse json string and add values to the registrant
+		 */
+		JSONParser parser = new JSONParser();
+		try {
+			JSONObject regfull = (JSONObject)parser.parse(jsonstring);
+			JSONObject res = (JSONObject)regfull.get("results");
+			if(res != null){
+				Iterator keyIter = res.entrySet().iterator();
+				while(keyIter.hasNext()){
+					Map.Entry en = (Map.Entry)keyIter.next();
+					String key = (String) en.getKey();
+					System.out.println("Key: "+ key);
+					if(en.getValue() != null)
+						System.out.printf("Key: %s,  value type:%s\n", key, en.getValue().getClass().getName());
+					if(key.equals("personal_data")){
+						// information does not need an update
+						continue;
+					} else if(key.equals("_type")){
+						continue;
+					} else if(key.equals("_fossil")){
+						continue;
+					} else {
+						if(en.getValue() != null){
+							if(en.getValue().getClass().equals(JSONObject.class)){
+								// JSON Object
+								System.out.println("Value is a json object");
+							} else {
+								reg.setRegistrantInformation(en.getKey().toString(), en.getValue().toString());
+							}
+						} else {
+							/*
+							 * Set empty string for the key
+							 */
+							reg.setRegistrantInformation((String)en.getKey(), "");
+						}
+					}
+				}
+			}
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }

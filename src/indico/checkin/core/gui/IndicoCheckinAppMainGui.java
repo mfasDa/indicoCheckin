@@ -203,6 +203,8 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 			handleExit();
 		else if(arg0.getActionCommand().equals("newUser"))
 			newUserClicked();
+		else if(arg0.getActionCommand().equals("changePayment"))
+			changePaymentClicked();
 		else if(arg0.getActionCommand().equals("cancel")){
 			handleCancel();
 		}
@@ -340,8 +342,14 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 	
 	public void changePaymentClicked(){
 		/*
-		 * Handle click to changePayment button
+		 * Registrant has paid at the conference desk:
+		 * Enable buttons for checkin and ticket generation
+		 * Put information to indico
 		 */
+		this.generateTicketButton.setEnabled(true);
+		this.checkinButton.setEnabled(true);
+		this.changePaymentButton.setEnabled(false);
+		// TODO: put information to indico
 	}
 	
 	public void printTicketClicked(){
@@ -352,7 +360,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 	
 	public void checkinClicked(){
 		/*
-		 * Handle Click to checkin button
+		 * Registrant checked in: 
 		 */
 	}
 	
@@ -364,9 +372,24 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 			// check ticket validity
 			current = registrants.FindRegistrant(eticket);
 			if(current != null){
+				System.out.printf("Fetch full information for registrant %d\n", eticket.getRegistrantID());
+				this.indicoConnection.FetchFullRegistrantInformation(current, eticket);
 				JOptionPane.showMessageDialog(this, String.format("ETicket read successfully and valid: %s", current.getFullName()));				
-				this.generateTicketButton.setEnabled(true);
-				this.changePaymentButton.setEnabled(true);
+				if(current.hasPaid()){
+					// if the registrant has already payed, allow checkin
+					// TODO: remove printout when debugging finished
+					System.out.println("Registrant has already paid");
+					this.generateTicketButton.setEnabled(true);
+					this.checkinButton.setEnabled(true);
+					this.changePaymentButton.setEnabled(false);
+				} else {
+					// Only enable button that the changes payment
+					// TODO: remove printout when debugging finished
+					System.out.println("Registrant did not yet pay");
+					this.generateTicketButton.setEnabled(false);
+					this.checkinButton.setEnabled(false);
+					this.changePaymentButton.setEnabled(true);
+				}
 			} else {
 				JOptionPane.showMessageDialog(this, "ETicket read successfully, but registrant not found");
 			}
