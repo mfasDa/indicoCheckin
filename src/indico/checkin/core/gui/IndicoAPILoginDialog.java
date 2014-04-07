@@ -30,10 +30,12 @@ public class IndicoAPILoginDialog extends JDialog{
 	private JButton btncancel;
 	private boolean infoset;
 	
-	public IndicoAPILoginDialog(Frame owner) {
-		super(owner, "Indico connection login", true);
+	public IndicoAPILoginDialog(Frame owner){
+		super(owner, "Indico connection login", false);
 		
 		this.infoset = false;
+		
+		this.setAutoRequestFocus(true);
 		
 		JPanel pnlInfo = new JPanel(new GridBagLayout());
 		GridBagConstraints cs = new GridBagConstraints();
@@ -46,6 +48,7 @@ public class IndicoAPILoginDialog extends JDialog{
 		cs.insets = new Insets(10,10,3,3);
 		pnlInfo.add(new JLabel("Server:"), cs);
 		this.tfserver = new JTextField(20);
+		tfserver.setEditable(true);
 		cs.gridx = 1;
 		cs.gridy = 0;
 		cs.gridwidth = 2;	// make bag broader
@@ -197,4 +200,5 @@ public class IndicoAPILoginDialog extends JDialog{
 	public boolean isInfoSet(){
 		return this.infoset;
 	}
+
 }
