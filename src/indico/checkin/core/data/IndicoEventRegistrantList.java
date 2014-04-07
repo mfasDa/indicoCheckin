@@ -84,4 +84,20 @@ public class IndicoEventRegistrantList{
 		}
 	}
 
+	public int getNumberOfRegistrants(){
+		return reglist.size();
+	}
+	
+	public boolean isTicketValid(IndicoParsedETicket ticket){
+		/*
+		 * check validity of the ticket:
+		 * event ID has
+		 */
+		int eventID = Integer.parseInt(this.metadata.getMetadata("eventID"));
+		if(eventID == ticket.getEventID()){
+			IndicoRegistrant reg = FindRegistrant(ticket);
+			if(reg.isTicketValid(ticket)) return true;
+		}
+		return false;
+	}
 }

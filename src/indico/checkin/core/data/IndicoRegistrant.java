@@ -129,4 +129,12 @@ public class IndicoRegistrant {
 	public String getWebpage(){
 		return this.getPersonalInformation("address");
 	}
+	
+	public boolean isTicketValid(IndicoParsedETicket ticket){
+		/*
+		 * check whether ticket is valid:
+		 *  * secret key has to be correct
+		 */
+		return this.getSecretKey().equals(ticket.getSecret());
+	}
 }

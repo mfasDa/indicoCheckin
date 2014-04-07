@@ -268,18 +268,40 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 	private void handleLogin(){
 		/*
 		 * Perform LoginDialog,
-		 * enable new user button and API info button if successfull, and
-		 * disable login button
+		 * enable new user button and API info button if successfull, read
+		 * registrant list for the given event ID and disable login button
 		 */
 		IndicoAPILoginDialog loginDialog = new IndicoAPILoginDialog(this);
 		loginDialog.setVisible(true);
 		if(loginDialog.isInfoSet()){
 			this.indicoConnection.setApikey(loginDialog.getAPIkey());
 			this.indicoConnection.setApisecret(loginDialog.getAPIsecret());
-			this.newUserButton.setEnabled(true);
-			this.loginbutton.setEnabled(false);
-			this.apiinfobutton.setEnabled(true);
-			this.isLoggedIn = true;
+			this.indicoConnection.setServer(loginDialog.getServerAddress());
+			this.indicoConnection.setEventID(loginDialog.getEventID());
+			boolean success = false;
+			try {
+				this.registrants = this.indicoConnection.FetchRegistrantList();
+				success = true;
+			} catch (RegistrantListFetchingException e) {
+				// Failed getting registrant list from the server 
+				JOptionPane.showMessageDialog(this, String.format("Failed loading registrant list: %s", e.getMessage()));
+			}
+			if(success){
+				/*
+				 * Registrants correctly read:
+				 * Show message dialog with the number of registrants
+				 * Enable buttons for registrant processing and disable login
+				 * button
+				 */
+				JOptionPane.showMessageDialog(this, 
+						String.format("Found %d registrants for event %s", 
+								this.registrants.getNumberOfRegistrants(), 
+								this.indicoConnection.getEventID()));
+				this.newUserButton.setEnabled(true);
+				this.loginbutton.setEnabled(false);
+				this.apiinfobutton.setEnabled(true);
+				this.isLoggedIn = true;
+			}
 		}
 	}
 	
@@ -338,23 +360,18 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		/*
 		 * Ticket was parsed
 		 */
-		if(this.registrants == null){
-			try {
-				registrants = this.indicoConnection.FetchRegistrantList(eticket);
-				current = registrants.FindRegistrant(eticket);
-				if(current != null){
-					JOptionPane.showMessageDialog(this, String.format("ETicket read successfully: %s", current.getFullName()));				
-					this.generateTicketButton.setEnabled(true);
-					this.changePaymentButton.setEnabled(true);
-				} else {
-					JOptionPane.showMessageDialog(this, "ETicket read successfully, but registrant not found");
-				}
-			} catch (RegistrantListFetchingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				JOptionPane.showMessageDialog(this, "ETicket read successfully, but connection failed");
-				
+		if(registrants.isTicketValid(eticket)){
+			// check ticket validity
+			current = registrants.FindRegistrant(eticket);
+			if(current != null){
+				JOptionPane.showMessageDialog(this, String.format("ETicket read successfully and valid: %s", current.getFullName()));				
+				this.generateTicketButton.setEnabled(true);
+				this.changePaymentButton.setEnabled(true);
+			} else {
+				JOptionPane.showMessageDialog(this, "ETicket read successfully, but registrant not found");
 			}
+		} else {
+			JOptionPane.showMessageDialog(this, "Invalid ETicket");
 		}
 		finishBarcodeThread();
 	}
