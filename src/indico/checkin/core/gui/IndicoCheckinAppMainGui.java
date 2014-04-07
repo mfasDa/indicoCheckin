@@ -313,7 +313,9 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		 */
 		IndicoAPIInfoDialog infoDialog = new IndicoAPIInfoDialog(this, 
 				this.indicoConnection.getApikey(), 
-				this.indicoConnection.getApisecret());
+				this.indicoConnection.getApisecret(),
+				this.indicoConnection.getServer(),
+				this.indicoConnection.getEventID());
 		infoDialog.setVisible(true);
 	}
 	
