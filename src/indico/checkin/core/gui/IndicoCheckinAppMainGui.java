@@ -10,6 +10,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
 import indico.checkin.core.api.IndicoAPIConnector;
+import indico.checkin.core.api.RegistrantBuilderException;
 import indico.checkin.core.api.RegistrantListFetchingException;
 import indico.checkin.core.data.IndicoEventRegistrantList;
 import indico.checkin.core.data.IndicoParsedETicket;
@@ -300,6 +301,8 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 				this.apiinfobutton.setEnabled(true);
 				this.isLoggedIn = true;
 			}
+		} else {
+			System.out.println("Loggin info not set");
 		}
 	}
 	
@@ -371,7 +374,11 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 			current = registrants.FindRegistrant(eticket);
 			if(current != null){
 				System.out.printf("Fetch full information for registrant %d\n", eticket.getRegistrantID());
-				this.indicoConnection.FetchFullRegistrantInformation(current, eticket);
+				try{
+					this.indicoConnection.FetchFullRegistrantInformation(current, eticket);
+				} catch (RegistrantBuilderException e){
+					JOptionPane.showMessageDialog(this, String.format("Failed reading registrant: %s", e.getMessage()));
+				}
 				JOptionPane.showMessageDialog(this, String.format("ETicket read successfully and valid: %s", current.getFullName()));				
 				if(current.hasPaid()){
 					// if the registrant has already payed, allow checkin

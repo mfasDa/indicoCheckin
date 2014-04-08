@@ -7,6 +7,7 @@ public class IndicoRegistrant {
 
 	Map<String,String> personalData;
 	Map<String,String> registrantInformation;
+	IndicoRegistrantFullInformation fullInformation;
 	
 	public IndicoRegistrant(){
 		this.personalData = new HashMap<String,String>();
@@ -24,6 +25,11 @@ public class IndicoRegistrant {
 		return -1;
 	}
 	
+	public void setFullInformation(IndicoRegistrantFullInformation info){
+		this.fullInformation = info;
+	}
+	
+	
 	public void setPersonalInformation(String key, String value){
 		/*
 		 * Store personal data
@@ -36,6 +42,10 @@ public class IndicoRegistrant {
 		 * Store registrant info
 		 */
 		this.registrantInformation.put(key, value);
+	}
+	
+	public IndicoRegistrantFullInformation getFullInformation(){
+		return this.fullInformation;
 	}
 	
 	public String getPersonalInformation(String key){
@@ -134,7 +144,9 @@ public class IndicoRegistrant {
 		/*
 		 * check whether registrant has already payed
 		 */
-		return this.getRegistrantInformation("paid").equals("true");
+		if(fullInformation != null)
+			return fullInformation.isPaid();
+		else return false;
 	}
 
 	public boolean isTicketValid(IndicoParsedETicket ticket){

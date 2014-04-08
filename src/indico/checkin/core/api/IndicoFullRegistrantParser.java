@@ -18,31 +18,26 @@ public class IndicoFullRegistrantParser {
 	 * Parser for JSON based indico registrant full information
 	 */
 	
-	public IndicoRegistrantFullInformation parseRegistrant(String jsonstring){
+	public IndicoRegistrantFullInformation parseRegistrant(String jsonstring) throws ParseException {
 		/*
 		 * Parse json result and convert to registrant full information
 		 */
 		IndicoRegistrantFullInformation registrant = null;
 		JSONParser parser = new JSONParser();
-		try {
-			JSONObject parsedRegistrant = (JSONObject)parser.parse(jsonstring);
-			registrant = new IndicoRegistrantFullInformation();
-			Iterator keyIter = parsedRegistrant.entrySet().iterator();
-			while(keyIter.hasNext()){
-				Map.Entry entry = (Map.Entry)keyIter.next();
-				if(entry.getKey().equals("complete"))
-					registrant.setComplete((boolean)entry.getValue());
-				if(entry.getKey().equals("results")){
-					// Iterate over keys in the result section
-					JSONObject registrantResults = (JSONObject)entry.getValue();
-					Iterator resultIter = registrantResults.entrySet().iterator();
-					while(resultIter.hasNext())
-						handleEntry(registrant, (Map.Entry)resultIter.next());
-				}
+		JSONObject parsedRegistrant = (JSONObject)parser.parse(jsonstring);
+		registrant = new IndicoRegistrantFullInformation();
+		Iterator keyIter = parsedRegistrant.entrySet().iterator();
+		while(keyIter.hasNext()){
+			Map.Entry entry = (Map.Entry)keyIter.next();
+			if(entry.getKey().equals("complete"))
+				registrant.setComplete((boolean)entry.getValue());
+			if(entry.getKey().equals("results")){
+				// Iterate over keys in the result section
+				JSONObject registrantResults = (JSONObject)entry.getValue();
+				Iterator resultIter = registrantResults.entrySet().iterator();
+				while(resultIter.hasNext())
+					handleEntry(registrant, (Map.Entry)resultIter.next());
 			}
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		return registrant;
 	}

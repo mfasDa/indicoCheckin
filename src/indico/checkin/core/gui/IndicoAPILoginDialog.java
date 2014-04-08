@@ -31,7 +31,7 @@ public class IndicoAPILoginDialog extends JDialog{
 	private boolean infoset;
 	
 	public IndicoAPILoginDialog(Frame owner){
-		super(owner, "Indico connection login", false);
+		super(owner, "Indico connection login", true);
 		
 		this.infoset = false;
 		
