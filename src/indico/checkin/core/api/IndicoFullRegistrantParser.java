@@ -54,7 +54,6 @@ public class IndicoFullRegistrantParser {
 		 * + checkin_date
 		 * + socialEvents
 		 */
-		System.out.printf("Key: %s\n", entry.getKey());
 		String key = (String)entry.getKey();
 		Object value = entry.getValue();
 		if(key.equals("_type"))
@@ -86,7 +85,6 @@ public class IndicoFullRegistrantParser {
 		/*
 		 * Convert info group
 		 */
-		System.out.printf("Group ID: %s, Title: %s\n", group.get("id").toString(),group.get("title").toString());
 		try{
 			IndicoRegistrantInfoGroup infogroup = registrant.createInfoGroup((String)group.get("title"), (String)group.get("_fossil"), 
 				(String)group.get("_type"), Long.parseLong(group.get("id").toString()));
@@ -104,7 +102,6 @@ public class IndicoFullRegistrantParser {
 		/*
 		 * Convert response item from JSON Object to field object
 		 */
-		System.out.printf("Caption: %s\n", item.get("caption").toString());
 		IndicoRegistrantInfoField field = new IndicoRegistrantInfoField();
 		field.setCaption((String)item.get("caption"));
 		field.setType((String)item.get("_type"));

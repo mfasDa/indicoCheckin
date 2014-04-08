@@ -107,7 +107,7 @@ public class IndicoAPIConnector {
 		if(this.apikey.isEmpty() || this.apisecret.isEmpty()) 
 			throw new IndicoURLBuilderException("API key or secret not specified");
 		Long timestamp = new Long(System.currentTimeMillis()/1000);
-		String contenturl = String.format("/export/event/%d/registrant/%d.json?ak=%s&authl_key=%s&details=full&timestamp=%d", this.getEventID(), ticket.getRegistrantID(), this.apikey, ticket.getAuthKey(), timestamp);
+		String contenturl = String.format("/export/event/%d/registrant/%d.json?ak=%s&authl_key=%s&detail=full&timestamp=%d", this.getEventID(), ticket.getRegistrantID(), this.apikey, ticket.getAuthKey(), timestamp);
 		
 		// Priduce signature
 		String signature = "";
