@@ -376,6 +376,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 				System.out.printf("Fetch full information for registrant %d\n", eticket.getRegistrantID());
 				try{
 					this.indicoConnection.FetchFullRegistrantInformation(current, eticket);
+					this.infopanel.UpdateRegistrantData(current);
 				} catch (RegistrantBuilderException e){
 					JOptionPane.showMessageDialog(this, String.format("Failed reading registrant: %s", e.getMessage()));
 				}

@@ -27,7 +27,6 @@ public class IndicoBarcodeHandler {
 		/*
 		 * Read out images from webcam until barcode is successfully handled
 		 */
-		System.out.println("Called");
 		Webcam webcam = Webcam.getDefault();
 		boolean hasRead = false;
 		webcam.open();
@@ -50,7 +49,7 @@ public class IndicoBarcodeHandler {
 		if(hasRead){
 			// Barcode parsed successfully
 			IndicoJSONBarcodeParser parser = new IndicoJSONBarcodeParser();
-			System.out.printf("Ticket: %s\n", barcode);
+			// System.out.printf("Ticket: %s\n", barcode);
 			try{
 				eticket = parser.parse(barcode);
 			} catch (ETicketDecodingException e){
