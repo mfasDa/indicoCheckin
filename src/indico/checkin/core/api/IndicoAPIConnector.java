@@ -9,6 +9,8 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.InvalidKeyException;
@@ -17,6 +19,8 @@ import java.security.NoSuchAlgorithmException;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 public class IndicoAPIConnector {
@@ -163,7 +167,7 @@ public class IndicoAPIConnector {
 		return reg;
 	}
 	
-	public void FetchFullRegistrantInformation(IndicoRegistrant reg, IndicoParsedETicket ticket) throws RegistrantBuilderException {
+	public void fetchFullRegistrantInformation(IndicoRegistrant reg, IndicoParsedETicket ticket) throws RegistrantBuilderException {
 		/*
 		 * Fetch full registrant information
 		 */
@@ -199,7 +203,7 @@ public class IndicoAPIConnector {
 		}
 	}
 
-	public IndicoEventRegistrantList FetchRegistrantList() throws RegistrantListFetchingException{
+	public IndicoEventRegistrantList fetchRegistrantList() throws RegistrantListFetchingException{
 		/*
 		 * Fetch registrant list for a given event
 		 */
@@ -234,6 +238,86 @@ public class IndicoAPIConnector {
 		IndicoEventRegistrantList reglist = jsonparser.parseJSONRegistrantList(jsonresult);
 		reglist.setMetadata("eventID", String.format("%d", this.eventID));
 		return reglist;
+	}
+	
+	public boolean pushCheckin(IndicoRegistrant reg) throws IndicoPostException{
+		/*
+		 * Set registrant checkin status to true in indico.
+		 * Returns true if successfull, false otherwise
+		 * Updates information in the registrant object in case of success
+		 */
+		
+		// Build URL and POST body
+		if(this.eventID < 0 || this.server.isEmpty()) 
+			throw new IndicoPostException("Indico server or Event ID not specified");
+		if(this.apikey.isEmpty() || this.apisecret.isEmpty()) 
+			throw new IndicoPostException("API key or secret not specified");
+		Long timestamp = new Long(System.currentTimeMillis()/1000);
+		String urlappendix = String.format("/api/event/%d/registrant/%d/checkin.json",eventID, reg.getID());
+		String poststring = String.format("ak=%s&checked_in=yes&secret=%s&timestamp=%d", apikey, reg.getSecretKey(), timestamp);
+		String signature = "";
+		try {
+			signature = createSignature(String.format("%s?%s", urlappendix,poststring), apisecret);
+		} catch (EncryptionException e) {
+			throw new IndicoPostException(String.format("Encryption error: %s", e.getMessage()));
+		}
+		poststring += String.format("&signature=%s", signature);
+		String myurl = String.format("%s%s", server, urlappendix);
+		// TODO: remove output after finish debugging 
+		System.out.printf("POST URL: %s\n", myurl);
+		System.out.printf("POST arguments: %s\n", poststring);
+		
+		// Perform POST
+		String resultJSON = "";
+		try {
+			URL indicoUrl = new URL(myurl);
+			HttpURLConnection con = (HttpURLConnection) indicoUrl.openConnection();
+			con.setRequestMethod("POST");
+			con.setDoInput(true);
+			con.setDoOutput(true);
+			con.setUseCaches(false);
+			
+			// Send request to indico
+			OutputStreamWriter sender = new OutputStreamWriter(con.getOutputStream());
+			sender.write(poststring);
+			sender.flush();
+			
+			// Process answer from the server
+			BufferedReader receiver = new BufferedReader(new InputStreamReader(con.getInputStream()));
+			StringBuilder sb = new StringBuilder();
+			String tmpstring = "";
+			while((tmpstring = receiver.readLine()) != null)
+				sb.append(tmpstring);
+			resultJSON = sb.toString();
+			// TODO: remove output after finish debugging 
+			System.out.printf("Answer from server: %s\n", resultJSON);
+		} catch (MalformedURLException e) {
+			throw new IndicoPostException(String.format("URL %s invalid", myurl));
+		} catch (IOException e) {
+			throw new IndicoPostException("Failed receiving answer from indico server");
+		}
+		
+		// Evaluate answer from server
+		boolean status = false;
+		if(!resultJSON.isEmpty()){
+			JSONParser parser = new JSONParser();
+			try {
+				JSONObject answer = (JSONObject)parser.parse(resultJSON);
+				boolean completed = (boolean)answer.get("complete");
+				if(completed){
+					JSONObject  checkinResult = (JSONObject)answer.get("results");
+					boolean checkinStatus = (boolean)checkinResult.get("checked_in");
+					if(checkinStatus){
+						reg.setCheckinDate(checkinResult.get("checkin_date").toString());
+						reg.setCheckedIn(true);
+						status = true;
+					}
+				}
+			} catch (ParseException e) {
+				throw new IndicoPostException("Unable to process anser from indico server");
+			}
+		} 
+		return status;
 	}
 
 }

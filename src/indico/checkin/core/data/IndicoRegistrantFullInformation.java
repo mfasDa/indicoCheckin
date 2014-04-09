@@ -169,6 +169,18 @@ public class IndicoRegistrantFullInformation {
 		this.checkinDate = new Date(timeinmilliseconds);
 	}
 	
+	public void setCheckinDate(String datestring){
+		if(!datestring.isEmpty()){
+			DateFormat formatter = new SimpleDateFormat("dd/mm/yy HH:MM");
+			try {
+				this.checkinDate = formatter.parse(datestring);
+			} catch (ParseException e) {
+				System.out.println("Invalid date format");
+			}
+		}
+	}
+
+	
 	public Date getRegistrationDate(){
 		return this.registrationDate;
 	}

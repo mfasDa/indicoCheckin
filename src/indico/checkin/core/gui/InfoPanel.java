@@ -44,4 +44,8 @@ public class InfoPanel extends JPanel{
 	public void UpdateRegistrantData(IndicoRegistrant registrant){
 		tablemodel.SetRegistrant(registrant);
 	}
+
+	public void UpdateRegistrantDisplay() {
+		tablemodel.setInfoUpdated();
+	}
 }

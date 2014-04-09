@@ -48,6 +48,11 @@ public class IndicoRegistrant {
 		return this.fullInformation;
 	}
 	
+	public void setCheckedIn(boolean result){
+		setRegistrantInformation("checked_in", result ? "true" : "false");
+		if(fullInformation != null) fullInformation.setCheckedin(result);
+	}
+	
 	public String getPersonalInformation(String key){
 		/*
 		 * Return value for key in personal data
@@ -155,5 +160,10 @@ public class IndicoRegistrant {
 		 *  * secret key has to be correct
 		 */
 		return this.getSecretKey().equals(ticket.getSecret());
+	}
+	
+	public void  setCheckinDate(String checkinDate){
+		if(fullInformation != null)
+			fullInformation.setCheckinDate(checkinDate);
 	}
 }

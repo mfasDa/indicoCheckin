@@ -60,4 +60,8 @@ public class RegistrantInfoDisplayModel extends AbstractTableModel {
 		registrant = reg;
 		this.fireTableRowsUpdated(0, 4);
 	}
+
+	public void setInfoUpdated() {
+		this.fireTableRowsUpdated(0, 4);
+	}
 }

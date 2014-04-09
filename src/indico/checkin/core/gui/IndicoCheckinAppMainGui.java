@@ -10,6 +10,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
 import indico.checkin.core.api.IndicoAPIConnector;
+import indico.checkin.core.api.IndicoPostException;
 import indico.checkin.core.api.RegistrantBuilderException;
 import indico.checkin.core.api.RegistrantListFetchingException;
 import indico.checkin.core.data.IndicoEventRegistrantList;
@@ -206,6 +207,8 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 			newUserClicked();
 		else if(arg0.getActionCommand().equals("changePayment"))
 			changePaymentClicked();
+		else if(arg0.getActionCommand().equals("checkin"))
+			handleCheckinButton();
 		else if(arg0.getActionCommand().equals("cancel")){
 			handleCancel();
 		}
@@ -279,7 +282,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 			this.indicoConnection.setEventID(loginDialog.getEventID());
 			boolean success = false;
 			try {
-				this.registrants = this.indicoConnection.FetchRegistrantList();
+				this.registrants = this.indicoConnection.fetchRegistrantList();
 				success = true;
 			} catch (RegistrantListFetchingException e) {
 				// Failed getting registrant list from the server 
@@ -359,10 +362,26 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		 */
 	}
 	
-	public void checkinClicked(){
+	public void handleCheckinButton(){
 		/*
 		 * Registrant checked in: 
+		 * Post checkin status to indico, update registrant and registrant display, 
+		 * and disable checkin button 
 		 */
+		if(current != null){
+			try {
+				boolean status = indicoConnection.pushCheckin(current);
+				if(status){
+					// checkin successfull
+					JOptionPane.showMessageDialog(this, String.format("Registrant %s successfully checked in", current.getFullName()));
+					infopanel.UpdateRegistrantDisplay();
+					this.checkinButton.setEnabled(false);					
+				} else
+					JOptionPane.showMessageDialog(this, String.format("Checkin of registrant %s was not successfull", current.getFullName()));
+			} catch (IndicoPostException e) {
+				JOptionPane.showMessageDialog(this, String.format("Checkin failure: %s", e.getMessage()));
+			}
+		}
 	}
 	
 	public void handleEticketParsed(){
@@ -375,7 +394,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 			if(current != null){
 				System.out.printf("Fetch full information for registrant %d\n", eticket.getRegistrantID());
 				try{
-					this.indicoConnection.FetchFullRegistrantInformation(current, eticket);
+					this.indicoConnection.fetchFullRegistrantInformation(current, eticket);
 					this.infopanel.UpdateRegistrantData(current);
 				} catch (RegistrantBuilderException e){
 					JOptionPane.showMessageDialog(this, String.format("Failed reading registrant: %s", e.getMessage()));
