@@ -196,4 +196,17 @@ public class IndicoRegistrantFullInformation {
 	public void setComplete(boolean complete) {
 		this.complete = complete;
 	}
+	
+	public double getFullPrice(){
+		/*
+		 * Calculate the full price of the registrant
+		 */
+		double fullPrice = 0.;
+		Iterator<IndicoRegistrantInfoGroup> groupIter = miscallaneousGroups.iterator();
+		while(groupIter.hasNext()){
+			IndicoRegistrantInfoGroup tmpGroup = groupIter.next();
+			fullPrice += tmpGroup.getTotalPrice();
+		}
+		return fullPrice;
+	}
 }

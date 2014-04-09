@@ -1,6 +1,7 @@
 package indico.checkin.core.data;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class IndicoRegistrantInfoGroup {
@@ -71,5 +72,20 @@ public class IndicoRegistrantInfoGroup {
 		field.setCaption(caption);
 		setInfoField(field);
 		return field;
+	}
+	
+	public double getTotalPrice(){
+		/*
+		 * Get the full price of the group
+		 */
+		double price = 0;
+		Iterator<IndicoRegistrantInfoField> fieldIter = data.iterator();
+		while(fieldIter.hasNext()){
+			IndicoRegistrantInfoField tmpField = fieldIter.next();
+			if(tmpField.hasPrice() && tmpField.getQuantity() > 0){
+				price += tmpField.getPrice()*tmpField.getQuantity();
+			}
+		}
+		return price;
 	}
 }

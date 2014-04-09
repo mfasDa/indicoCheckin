@@ -166,4 +166,12 @@ public class IndicoRegistrant {
 		if(fullInformation != null)
 			fullInformation.setCheckinDate(checkinDate);
 	}
+	
+	public double getFullPrice(){
+		/*
+		 * Get the total price for a registrant
+		 */
+		if(fullInformation != null) return fullInformation.getFullPrice();
+		return 0.;
+	}
 }

@@ -18,7 +18,7 @@ public class RegistrantInfoDisplayModel extends AbstractTableModel {
 
 	@Override
 	public int getRowCount() {
-		return 5;
+		return 6;
 	}
 
 	@Override
@@ -28,7 +28,7 @@ public class RegistrantInfoDisplayModel extends AbstractTableModel {
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		String rowTitles[] = {"Last Name:", "First Name:", "Registrant ID:", "Paid:", "Checked in:"};
+		String rowTitles[] = {"Last Name:", "First Name:", "Registrant ID:", "Paid:", "Checked in:", "Price:"};
 		if(columnIndex == 0){
 			return rowTitles[rowIndex];
 		} else {
@@ -49,6 +49,9 @@ public class RegistrantInfoDisplayModel extends AbstractTableModel {
 					break;
 				case 4:
 					entry = registrant.hasCheckedIn() ? "yes" : "no";
+					break;
+				case 5:
+					entry = String.format("EUR %.2f", registrant.getFullPrice());
 					break;
 				}
 			}

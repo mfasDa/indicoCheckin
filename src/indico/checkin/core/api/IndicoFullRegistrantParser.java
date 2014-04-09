@@ -114,7 +114,7 @@ public class IndicoFullRegistrantParser {
 		if(!item.get("id").toString().isEmpty())
 			field.setId(Long.parseLong(item.get("id").toString()));
 		if(!item.get("price").toString().isEmpty())
-			field.setPrice(Integer.parseInt(item.get("price").toString()));
+			field.setPrice(Double.parseDouble(item.get("price").toString()));
 		if(!item.get("quantity").toString().isEmpty())
 			field.setQuantity(Integer.parseInt(item.get("quantity").toString()));
 		field.setCurrency((String)item.get("currency"));

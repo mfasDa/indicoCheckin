@@ -9,7 +9,7 @@ public class IndicoRegistrantInfoField {
 	private String htmlname;
 	private String caption;
 	private String value;
-	private int price;
+	private double price;
 	private String currency;
 	private String fossil;
 	private long id;
@@ -73,11 +73,11 @@ public class IndicoRegistrantInfoField {
 		this.value = value;
 	}
 
-	public int getPrice() {
+	public double getPrice() {
 		return price;
 	}
 
-	public void setPrice(int price) {
+	public void setPrice(double price) {
 		this.price = price;
 	}
 
@@ -111,6 +111,13 @@ public class IndicoRegistrantInfoField {
 
 	public void setQuantity(int quantity) {
 		this.quantity = quantity;
+	}
+	
+	public boolean hasPrice() {
+		/*
+		 * Check if field has a positive, non-0 price
+		 */
+		return price >= 0 && Math.abs(price) > 1e-5;
 	}
 
 }
