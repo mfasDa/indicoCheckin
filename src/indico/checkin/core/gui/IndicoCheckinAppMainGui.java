@@ -14,6 +14,7 @@ import indico.checkin.core.api.IndicoPostException;
 import indico.checkin.core.api.RegistrantBuilderException;
 import indico.checkin.core.api.RegistrantListFetchingException;
 import indico.checkin.core.data.IndicoEventRegistrantList;
+import indico.checkin.core.data.IndicoLoginData;
 import indico.checkin.core.data.IndicoParsedETicket;
 import indico.checkin.core.data.IndicoRegistrant;
 
@@ -283,52 +284,58 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 	
 	private void handleLogin(){
 		/*
-		 * Perform LoginDialog,
-		 * enable new user button and API info button if successfull, read
-		 * registrant list for the given event ID and disable login button
+		 * Show login dialog
+		 * Login dialog will return to function processLoginReturn
 		 */
 		IndicoAPILoginDialog loginDialog = new IndicoAPILoginDialog(this);
 		loginDialog.setVisible(true);
-		if(loginDialog.isInfoSet()){
-			this.indicoConnection.setApikey(loginDialog.getAPIkey());
-			this.indicoConnection.setApisecret(loginDialog.getAPIsecret());
-			this.indicoConnection.setServer(loginDialog.getServerAddress());
-			this.indicoConnection.setEventID(loginDialog.getEventID());
-			boolean success = false;
-			try {
-				this.registrants = this.indicoConnection.fetchRegistrantList();
-				success = true;
-			} catch (RegistrantListFetchingException e) {
-				// Failed getting registrant list from the server 
-				JOptionPane.showMessageDialog(this, String.format("Failed loading registrant list: %s", e.getMessage()));
-			}
-			if(success){
-				/*
-				 * Registrants correctly read:
-				 * Show message dialog with the number of registrants
-				 * Enable buttons for registrant processing and disable login
-				 * button
-				 */
-				if(this.registrants.getNumberOfRegistrants() > 0){
-					JOptionPane.showMessageDialog(this, 
-							String.format("Found %d registrants for event %s", 
-									this.registrants.getNumberOfRegistrants(), 
-									this.indicoConnection.getEventID()));
-					this.newUserButton.setEnabled(true);
-					this.loginbutton.setEnabled(false);
-					this.manualSearchButton.setEnabled(true);
-					this.isLoggedIn = true;
-					manualSearchModel = new RegistrantListModel(registrants);
-				} else {
-					JOptionPane.showMessageDialog(this, 
-							String.format("No registrants for event %s", 
-									this.indicoConnection.getEventID()));
-				}
-				this.apiinfobutton.setEnabled(true);
-			}
-		} else {
-			System.out.println("Loggin info not set");
+	}
+	
+	public void processLoginReturn(IndicoLoginData data){
+		/*
+		 * return function for the login dialog: 
+		 * - Connects to server and fetches registrant list
+		 * - In case the registrant list was transferred successfully,
+		 *   enable button for user processing
+		 * - Inform the user with message dialog about the result of the transfer
+		 */
+		this.indicoConnection.setApikey(data.getApikey());
+		this.indicoConnection.setApisecret(data.getApisecret());
+		this.indicoConnection.setServer(data.getServer());
+		this.indicoConnection.setEventID(data.getEvent());
+		boolean success = false;
+		try {
+			this.registrants = this.indicoConnection.fetchRegistrantList();
+			success = true;
+		} catch (RegistrantListFetchingException e) {
+			// Failed getting registrant list from the server 
+			JOptionPane.showMessageDialog(this, String.format("Failed loading registrant list: %s", e.getMessage()));
 		}
+		if(success){
+			/*
+			 * Registrants correctly read:
+			 * Show message dialog with the number of registrants
+			 * Enable buttons for registrant processing and disable login
+			 * button
+			 */
+			if(this.registrants.getNumberOfRegistrants() > 0){
+				JOptionPane.showMessageDialog(this, 
+						String.format("Found %d registrants for event %s", 
+								this.registrants.getNumberOfRegistrants(), 
+								this.indicoConnection.getEventID()));
+				this.newUserButton.setEnabled(true);
+				this.loginbutton.setEnabled(false);
+				this.manualSearchButton.setEnabled(true);
+				this.isLoggedIn = true;
+				manualSearchModel = new RegistrantListModel(registrants);
+			} else {
+				JOptionPane.showMessageDialog(this, 
+						String.format("No registrants for event %s", 
+								this.indicoConnection.getEventID()));
+			}
+			this.apiinfobutton.setEnabled(true);
+		}
+
 	}
 	
 	private void showApiInfoDialog(){

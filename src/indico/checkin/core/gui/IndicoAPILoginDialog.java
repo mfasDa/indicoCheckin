@@ -1,7 +1,8 @@
 package indico.checkin.core.gui;
 
+import indico.checkin.core.data.IndicoLoginData;
+
 import java.awt.BorderLayout;
-import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -28,11 +29,13 @@ public class IndicoAPILoginDialog extends JDialog{
 	private JTextField tfapisecret;
 	private JButton btnconfirm;
 	private JButton btncancel;
+	private IndicoCheckinAppMainGui parentFrame;
 	private boolean infoset;
 	
-	public IndicoAPILoginDialog(Frame owner){
-		super(owner, "Indico connection login", true);
-		
+	public IndicoAPILoginDialog(IndicoCheckinAppMainGui owner){
+		super(owner, "Indico connection login", false);
+		owner.setEnabled(false);
+		this.parentFrame = owner;
 		this.infoset = false;
 		
 		this.setAutoRequestFocus(true);
@@ -124,6 +127,11 @@ public class IndicoAPILoginDialog extends JDialog{
 					infoset = false;
 				}
 				dispose();
+				// Return to parent
+				parentFrame.setEnabled(true);
+				if(infoset){
+					parentFrame.processLoginReturn(new IndicoLoginData(tfserver.getText(), Integer.parseInt(tfevent.getText()), tfapikey.getText(), tfapisecret.getText()));
+				}
 			}
 			
 		});
@@ -146,6 +154,7 @@ public class IndicoAPILoginDialog extends JDialog{
 					tfapisecret.setText("");
 				}
 				dispose();
+				parentFrame.setEnabled(true);
 			}
 			
 		});
