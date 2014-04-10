@@ -1,11 +1,10 @@
 package indico.checkin.core.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import indico.checkin.core.data.IndicoEventRegistrantList;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -13,8 +12,10 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
-public class ManualSearchDialog extends JDialog {
+public class ManualSearchDialog extends JDialog implements ListSelectionListener{
 
 	/**
 	 * Dailog for manual search of a registrant
@@ -22,15 +23,23 @@ public class ManualSearchDialog extends JDialog {
 	private static final long serialVersionUID = 1L;
 	
 	private JTable registrantDisplay;
+	private JButton confirmButton;
 	private boolean entrySelected;
 	
 	public ManualSearchDialog(JFrame parent, RegistrantListModel dataModel){
 		super(parent, "Select registrant", true);
+		this.setPreferredSize(new Dimension(700, 400));
 		entrySelected = false;
 		
 		registrantDisplay = new JTable(dataModel);
+		registrantDisplay.getColumnModel().getColumn(0).setPreferredWidth(200);
+		registrantDisplay.getColumnModel().getColumn(1).setPreferredWidth(200);		
+		registrantDisplay.getColumnModel().getColumn(2).setPreferredWidth(400);
+		registrantDisplay.getColumnModel().getColumn(3).setPreferredWidth(50);	
+		registrantDisplay.getSelectionModel().addListSelectionListener(this);
 		
-		JButton confirmButton = new JButton("Confirm");
+		confirmButton = new JButton("Confirm");
+		confirmButton.setEnabled(false);
 		confirmButton.addActionListener(new ActionListener(){
 
 			@Override
@@ -78,5 +87,11 @@ public class ManualSearchDialog extends JDialog {
 	
 	public int getSelectedRow(){
 		return registrantDisplay.getSelectedRow();
+	}
+
+	@Override
+	public void valueChanged(ListSelectionEvent e) {
+		// TODO Auto-generated method stub
+		confirmButton.setEnabled(true);
 	}
 }

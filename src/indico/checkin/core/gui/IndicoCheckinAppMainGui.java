@@ -309,16 +309,22 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 				 * Enable buttons for registrant processing and disable login
 				 * button
 				 */
-				JOptionPane.showMessageDialog(this, 
-						String.format("Found %d registrants for event %s", 
-								this.registrants.getNumberOfRegistrants(), 
-								this.indicoConnection.getEventID()));
-				this.newUserButton.setEnabled(true);
-				this.loginbutton.setEnabled(false);
+				if(this.registrants.getNumberOfRegistrants() > 0){
+					JOptionPane.showMessageDialog(this, 
+							String.format("Found %d registrants for event %s", 
+									this.registrants.getNumberOfRegistrants(), 
+									this.indicoConnection.getEventID()));
+					this.newUserButton.setEnabled(true);
+					this.loginbutton.setEnabled(false);
+					this.manualSearchButton.setEnabled(true);
+					this.isLoggedIn = true;
+					manualSearchModel = new RegistrantListModel(registrants);
+				} else {
+					JOptionPane.showMessageDialog(this, 
+							String.format("No registrants for event %s", 
+									this.indicoConnection.getEventID()));
+				}
 				this.apiinfobutton.setEnabled(true);
-				this.manualSearchButton.setEnabled(true);
-				this.isLoggedIn = true;
-				manualSearchModel = new RegistrantListModel(registrants);
 			}
 		} else {
 			System.out.println("Loggin info not set");
