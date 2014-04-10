@@ -34,6 +34,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 	private JButton generateTicketButton;
 	private JButton checkinButton;
 	private JButton cancelButton;
+	private JButton manualSearchButton;
 	
 	private InfoPanel infopanel;
 	
@@ -45,6 +46,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 	private IndicoParsedETicket eticket;
 	private IndicoRegistrant current;
 	private IndicoBarcodeHandler barcodeHandler;
+	private RegistrantListModel manualSearchModel;
 	
 	private boolean isLoggedIn;
 	
@@ -123,6 +125,17 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		nbcs.gridy = 0;
 		nbcs.gridwidth = 3;
 		processPanel.add(this.newUserButton, nbcs);
+		
+		this.manualSearchButton = new JButton("Search registrant");
+		this.manualSearchButton.addActionListener(this);
+		this.manualSearchButton.setActionCommand("manualSearch");
+		this.manualSearchButton.setEnabled(false);
+		GridBagConstraints mbcs = new GridBagConstraints();
+		mbcs.fill = GridBagConstraints.HORIZONTAL;
+		mbcs.gridx = 3;
+		mbcs.gridy = 0;
+		mbcs.gridwidth = 3;
+		processPanel.add(this.manualSearchButton, mbcs);
 
 		this.changePaymentButton = new JButton("Set payed");
 		this.changePaymentButton.addActionListener(this);
@@ -132,7 +145,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		cpbcs.fill = GridBagConstraints.HORIZONTAL;
 		cpbcs.gridx = 0;
 		cpbcs.gridy = 1;
-		cpbcs.gridwidth = 1;
+		cpbcs.gridwidth = 2;
 		processPanel.add(this.changePaymentButton, cpbcs);
 		
 		this.generateTicketButton = new JButton("Generate Ticket");
@@ -141,9 +154,9 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		this.generateTicketButton.setEnabled(false);
 		GridBagConstraints gtbcs = new GridBagConstraints();
 		gtbcs.fill = GridBagConstraints.HORIZONTAL;
-		gtbcs.gridx = 1;
+		gtbcs.gridx = 2;
 		gtbcs.gridy = 1;
-		gtbcs.gridwidth = 1;
+		gtbcs.gridwidth = 2;
 		processPanel.add(this.generateTicketButton, gtbcs);
 
 		this.checkinButton = new JButton("Checkin");
@@ -152,9 +165,9 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		this.checkinButton.setEnabled(false);
 		GridBagConstraints cibcs = new GridBagConstraints();
 		cibcs.fill = GridBagConstraints.HORIZONTAL;
-		cibcs.gridx = 2;
+		cibcs.gridx = 4;
 		cibcs.gridy = 1;
-		cibcs.gridwidth = 1;
+		cibcs.gridwidth = 2;
 		processPanel.add(this.checkinButton, cibcs);
 		
 		cancelButton = new JButton("Cancel");
@@ -164,7 +177,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		cabcs.fill = GridBagConstraints.HORIZONTAL;
 		cabcs.gridx = 0;
 		cabcs.gridy = 2;
-		cabcs.gridwidth = 3;
+		cabcs.gridwidth = 6;
 		processPanel.add(cancelButton, cabcs);
 		
 		JPanel buttonPanel = new JPanel(new FlowLayout());
@@ -195,7 +208,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		/*
-		 * Hanslö
+		 * Handle click to the different buttons
 		 */
 		if(arg0.getActionCommand().equals("login")){
 			handleLogin();
@@ -211,7 +224,8 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 			handleCheckinButton();
 		else if(arg0.getActionCommand().equals("cancel")){
 			handleCancel();
-		}
+		} else if(arg0.getActionCommand().equals("manualSearch"))
+			handleManualSearch();
 	}
 
 	@Override
@@ -302,7 +316,9 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 				this.newUserButton.setEnabled(true);
 				this.loginbutton.setEnabled(false);
 				this.apiinfobutton.setEnabled(true);
+				this.manualSearchButton.setEnabled(true);
 				this.isLoggedIn = true;
+				manualSearchModel = new RegistrantListModel(registrants);
 			}
 		} else {
 			System.out.println("Loggin info not set");
@@ -362,6 +378,44 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		 */
 	}
 	
+	public void handleManualSearch(){
+		/*
+		 * Open dialog with a list of all registrants where the user can search
+		 * a given registrant by the name. In case a registrant is selected, the same
+		 * procedure as for e-tickets is applied
+		 */
+		ManualSearchDialog searchDialog = new ManualSearchDialog(this, manualSearchModel);
+		searchDialog.setVisible(true);
+		if(searchDialog.isEntrySelected()){
+			current = manualSearchModel.getRegistrantForRow(searchDialog.getSelectedRow());
+			if(current != null){
+				try{
+					this.indicoConnection.fetchFullRegistrantInformation(current);
+					this.infopanel.UpdateRegistrantData(current);
+
+					if(current.hasPaid()){
+						// if the registrant has already payed, allow checkin
+						// TODO: remove printout when debugging finished
+						System.out.println("Registrant has already paid");
+						this.generateTicketButton.setEnabled(true);
+						this.checkinButton.setEnabled(true);
+						this.changePaymentButton.setEnabled(false);
+					} else {
+						// Only enable button that the changes payment
+						// TODO: remove printout when debugging finished
+						System.out.println("Registrant did not yet pay");
+						this.generateTicketButton.setEnabled(false);
+						this.checkinButton.setEnabled(false);
+						this.changePaymentButton.setEnabled(true);
+					}
+
+				} catch(RegistrantBuilderException e){
+					JOptionPane.showMessageDialog(this, String.format("Error accessing registration information for registrant %d", current.getID()));
+				}
+			}
+		}
+	}
+	
 	public void handleCheckinButton(){
 		/*
 		 * Registrant checked in: 
@@ -394,7 +448,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 			if(current != null){
 				System.out.printf("Fetch full information for registrant %d\n", eticket.getRegistrantID());
 				try{
-					this.indicoConnection.fetchFullRegistrantInformation(current, eticket);
+					this.indicoConnection.fetchFullRegistrantInformation(current);
 					this.infopanel.UpdateRegistrantData(current);
 				} catch (RegistrantBuilderException e){
 					JOptionPane.showMessageDialog(this, String.format("Failed reading registrant: %s", e.getMessage()));

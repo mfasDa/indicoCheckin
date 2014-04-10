@@ -102,7 +102,7 @@ public class IndicoAPIConnector {
 		return apiUrl.toString();
 	}
 	
-	private String CreateURLRegistrant(IndicoParsedETicket ticket) throws IndicoURLBuilderException{
+	private String CreateURLRegistrant(IndicoRegistrant reg) throws IndicoURLBuilderException{
 		/*
 		 * Build URL for registrant GET request
 		 */
@@ -111,7 +111,8 @@ public class IndicoAPIConnector {
 		if(this.apikey.isEmpty() || this.apisecret.isEmpty()) 
 			throw new IndicoURLBuilderException("API key or secret not specified");
 		Long timestamp = new Long(System.currentTimeMillis()/1000);
-		String contenturl = String.format("/export/event/%d/registrant/%d.json?ak=%s&authl_key=%s&detail=full&timestamp=%d", this.getEventID(), ticket.getRegistrantID(), this.apikey, ticket.getAuthKey(), timestamp);
+		String contenturl = String.format("/export/event/%d/registrant/%d.json?ak=%s", this.getEventID(), reg.getID(), this.apikey);
+		contenturl += String.format("&detail=full&timestamp=%d", timestamp);
 		
 		// Priduce signature
 		String signature = "";
@@ -167,13 +168,13 @@ public class IndicoAPIConnector {
 		return reg;
 	}
 	
-	public void fetchFullRegistrantInformation(IndicoRegistrant reg, IndicoParsedETicket ticket) throws RegistrantBuilderException {
+	public void fetchFullRegistrantInformation(IndicoRegistrant reg) throws RegistrantBuilderException {
 		/*
 		 * Fetch full registrant information
 		 */
 		String jsonresult = "";
 		try{
-			String myurl = CreateURLRegistrant(ticket);
+			String myurl = CreateURLRegistrant(reg);
 			System.out.printf("URL: %s\n", myurl);
 			URL indicourl = new URL(myurl);
 			

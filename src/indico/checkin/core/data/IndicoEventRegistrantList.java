@@ -100,4 +100,25 @@ public class IndicoEventRegistrantList{
 		}
 		return false;
 	}
+	
+	public List<IndicoRegistrant> getRegistrantList(){
+		return reglist;
+	}
+	
+	public Iterator<IndicoRegistrant> iterator(){
+		return reglist.iterator();
+	}
+	
+	public IndicoRegistrant getRegistrantById(long id){
+		IndicoRegistrant reg = null;
+		Iterator<IndicoRegistrant> regIter = reglist.iterator();
+		while(regIter.hasNext()){
+			IndicoRegistrant tmp = regIter.next();
+			if(tmp.getID() == id){
+				reg = tmp;
+				break;
+			}
+		}
+		return reg;
+	}
 }
