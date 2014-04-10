@@ -104,6 +104,10 @@ public class IndicoRegistrantFullInformation {
 		return event;
 	}
 	
+	public List<IndicoRegistrantInfoGroup> getListOfGroups(){
+		return miscallaneousGroups;
+	}
+	
 	public IndicoRegistrantInfoGroup findGroupByTitle(String title){
 		/*
 		 * Try to find info group according to the title
