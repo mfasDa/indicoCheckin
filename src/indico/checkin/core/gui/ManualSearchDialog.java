@@ -66,7 +66,6 @@ public class ManualSearchDialog extends JDialog {
 		this.getContentPane().add(new JScrollPane(registrantDisplay), BorderLayout.CENTER);
 		this.getContentPane().add(buttonPanel, BorderLayout.PAGE_END);
 		this.pack();
-		this.setVisible(true);
 	}
 
 	public boolean isEntrySelected() {
