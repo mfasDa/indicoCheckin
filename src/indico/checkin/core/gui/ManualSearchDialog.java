@@ -91,7 +91,9 @@ public class ManualSearchDialog extends JDialog implements ListSelectionListener
 
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
-		// TODO Auto-generated method stub
+		/*
+		 * Enable confirm button only in case an entry was selected		
+		 */
 		confirmButton.setEnabled(true);
 	}
 }
