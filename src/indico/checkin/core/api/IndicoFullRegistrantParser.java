@@ -52,7 +52,6 @@ public class IndicoFullRegistrantParser {
 		 * 
 		 * Currently unhandled
 		 * + checkin_date
-		 * + socialEvents
 		 */
 		String key = (String)entry.getKey();
 		Object value = entry.getValue();
@@ -78,6 +77,21 @@ public class IndicoFullRegistrantParser {
 			JSONArray groups = (JSONArray)value;
 			Iterator groupIter = groups.iterator();
 			while(groupIter.hasNext()) handleGroup(registrant, (JSONObject)groupIter.next());
+		} else if(key.equals("socialEvents")){
+			JSONArray events = (JSONArray)value;
+			Iterator eventIter = events.iterator();
+			while(eventIter.hasNext()){
+				JSONObject event = (JSONObject)eventIter.next();
+				registrant.createSocialEvent(
+						event.get("_type").toString(), 
+						event.get("_fossil").toString(), 
+						Integer.parseInt(event.get("id").toString()), 
+						Double.parseDouble(event.get("price").toString()), 
+						(long)event.get("noPlaces"), 
+						event.get("currency").toString(),
+						event.get("caption").toString()
+						);
+			}
 		}
 	}
 		

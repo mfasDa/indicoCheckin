@@ -83,6 +83,8 @@ public class IndicoRegistrantInfoGroup {
 		while(fieldIter.hasNext()){
 			IndicoRegistrantInfoField tmpField = fieldIter.next();
 			if(tmpField.hasPrice() && tmpField.getQuantity() > 0){
+				System.out.printf("Field: %s, Price: %f, Quantity: %d\n",
+						tmpField.getCaption(), tmpField.getPrice(), tmpField.getQuantity());
 				price += tmpField.getPrice()*tmpField.getQuantity();
 			}
 		}

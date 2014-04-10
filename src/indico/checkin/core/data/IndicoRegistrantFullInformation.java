@@ -14,6 +14,7 @@ public class IndicoRegistrantFullInformation {
 	 * Container object for full registrant information
 	 */
 	List<IndicoRegistrantInfoGroup> miscallaneousGroups;
+	List<IndicoRegistrantSocialEvent> socialEvents;
 	private String type;
 	private String fossil;
 	private String fullName;
@@ -28,6 +29,7 @@ public class IndicoRegistrantFullInformation {
 	
 	public IndicoRegistrantFullInformation(){
 		miscallaneousGroups = new LinkedList<IndicoRegistrantInfoGroup>();
+		socialEvents = new LinkedList<IndicoRegistrantSocialEvent>();
 		type = "";
 		fossil = "";
 		fullName = "";
@@ -45,6 +47,13 @@ public class IndicoRegistrantFullInformation {
 		 * Add info group to the list of groups
 		 */
 		miscallaneousGroups.add(group);
+	}
+	
+	public void AddSocialEvent(IndicoRegistrantSocialEvent event){
+		/*
+		 * Add social event to the list of social events
+		 */
+		socialEvents.add(event);
 	}
 	
 	public IndicoRegistrantInfoGroup createInfoGroup(String title){
@@ -73,6 +82,27 @@ public class IndicoRegistrantFullInformation {
 		return group;
 	}
 
+	public IndicoRegistrantSocialEvent createSocialEvent(int id){
+		/*
+		 * Create a new social event with only id as information and add it to 
+		 * the list of social events
+		 */
+		IndicoRegistrantSocialEvent event = new IndicoRegistrantSocialEvent();
+		event.setId(id);
+		AddSocialEvent(event);
+		return event;
+	}
+	
+	public IndicoRegistrantSocialEvent createSocialEvent(String type, String fossil, 
+			int id, double price, long numberPlaces, String currency, String caption){
+		/*
+		 * Create a new social event with all informations and add it to the list 
+		 * of social events
+		 */
+		IndicoRegistrantSocialEvent event = new IndicoRegistrantSocialEvent(type,fossil,id,price,numberPlaces,currency,caption);
+		AddSocialEvent(event);
+		return event;
+	}
 	
 	public IndicoRegistrantInfoGroup findGroupByTitle(String title){
 		/*
@@ -88,6 +118,27 @@ public class IndicoRegistrantFullInformation {
 			}
 		}
 		return result;
+	}
+	
+	public List<IndicoRegistrantSocialEvent> getSocialEvents(){
+		return socialEvents;
+	}
+	
+	public IndicoRegistrantSocialEvent findSocialEventById(int id){
+		/*
+		 * Find the social event by the event id
+		 * returns the event, or null if not found
+		 */
+		IndicoRegistrantSocialEvent event = null;
+		Iterator<IndicoRegistrantSocialEvent> eventIter = socialEvents.iterator();
+		while(eventIter.hasNext()){
+			IndicoRegistrantSocialEvent tmpEvent = eventIter.next();
+			if(tmpEvent.getId() == id){
+				event = tmpEvent;
+				break;
+			}
+		}
+		return event;
 	}
 
 	public String getType() {
@@ -205,8 +256,24 @@ public class IndicoRegistrantFullInformation {
 		Iterator<IndicoRegistrantInfoGroup> groupIter = miscallaneousGroups.iterator();
 		while(groupIter.hasNext()){
 			IndicoRegistrantInfoGroup tmpGroup = groupIter.next();
-			fullPrice += tmpGroup.getTotalPrice();
+			double tmpprice = tmpGroup.getTotalPrice();
+			fullPrice += tmpprice;
+			if(tmpprice > 0)
+				// TODO: Remove debug statement when code is finished
+				System.out.printf("Group: %s, Price: %f\n", tmpGroup.getTitle(), tmpprice);
 		}
+		// Process social events
+		Iterator<IndicoRegistrantSocialEvent> eventIter = socialEvents.iterator();
+		while(eventIter.hasNext()){
+			IndicoRegistrantSocialEvent event = eventIter.next();
+			if(event.getPrice() > 0)
+				// TODO: Remove debug statement when code is finished
+				System.out.printf("Registrant booked event: %d - %s - with price %f %s\n", event.getId(), event.getCaption(), event.getPrice(), event.getCurrency());
+			fullPrice += event.getTotalPrice();
+		}
+		// TODO: Remove debug statement when code is finished
+		System.out.println("=================================");
+		System.out.printf("Total price: %.2f\n", fullPrice);
 		return fullPrice;
 	}
 }
