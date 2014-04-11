@@ -379,10 +379,19 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		 * Enable buttons for checkin and ticket generation
 		 * Put information to indico
 		 */
-		this.generateTicketButton.setEnabled(true);
-		this.checkinButton.setEnabled(true);
-		this.changePaymentButton.setEnabled(false);
-		// TODO: put information to indico
+		boolean success = false;
+		try {
+			success = this.indicoConnection.pushPayment(current);
+		} catch (IndicoPostException e) {
+			JOptionPane.showMessageDialog(this, String.format("Payment setting failed: %s", e.getMessage()));
+		}
+		if(success){
+			this.changePaymentButton.setEnabled(false);
+			this.generateTicketButton.setEnabled(true);
+			if(!current.hasCheckedIn())
+				this.checkinButton.setEnabled(true);
+			infopanel.UpdateRegistrantDisplay();
+		}
 	}
 	
 	public void printTicketClicked(){
@@ -411,7 +420,8 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 						// TODO: remove printout when debugging finished
 						System.out.println("Registrant has already paid");
 						this.generateTicketButton.setEnabled(true);
-						this.checkinButton.setEnabled(true);
+						if(!current.hasCheckedIn())
+							this.checkinButton.setEnabled(true);
 						this.changePaymentButton.setEnabled(false);
 					} else {
 						// Only enable button that the changes payment
@@ -472,7 +482,8 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 					// TODO: remove printout when debugging finished
 					System.out.println("Registrant has already paid");
 					this.generateTicketButton.setEnabled(true);
-					this.checkinButton.setEnabled(true);
+					if(!current.hasCheckedIn())
+						this.checkinButton.setEnabled(true);
 					this.changePaymentButton.setEnabled(false);
 				} else {
 					// Only enable button that the changes payment

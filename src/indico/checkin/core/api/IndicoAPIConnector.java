@@ -1,7 +1,6 @@
 package indico.checkin.core.api;
 
 import indico.checkin.core.data.IndicoEventRegistrantList;
-import indico.checkin.core.data.IndicoParsedETicket;
 import indico.checkin.core.data.IndicoRegistrant;
 import indico.checkin.core.data.IndicoRegistrantFullInformation;
 
@@ -320,5 +319,86 @@ public class IndicoAPIConnector {
 		} 
 		return status;
 	}
+	
+	public boolean pushPayment(IndicoRegistrant reg) throws IndicoPostException{
+		/*
+		 * Set registrant payment status to true in indico.
+		 * Returns true if successfull, false otherwise
+		 * Updates information in the registrant object in case of success
+		 */
+		
+		// Build URL and POST body
+		if(this.eventID < 0 || this.server.isEmpty()) 
+			throw new IndicoPostException("Indico server or Event ID not specified");
+		if(this.apikey.isEmpty() || this.apisecret.isEmpty()) 
+			throw new IndicoPostException("API key or secret not specified");
+		Long timestamp = new Long(System.currentTimeMillis()/1000);
+		String urlappendix = String.format("/api/event/%d/registrant/%d/pay.json", eventID, reg.getID());
+		String poststring = String.format("ak=%s&is_paid=yes&timestamp=%d", apikey, timestamp);
+		String signature = "";
+		try {
+			signature = createSignature(String.format("%s?%s", urlappendix,poststring), apisecret);
+		} catch (EncryptionException e) {
+			throw new IndicoPostException(String.format("Encryption error: %s", e.getMessage()));
+		}
+		poststring += String.format("&signature=%s", signature);
+		String myurl = String.format("%s%s", server, urlappendix);
+		// TODO: remove output after finish debugging 
+		System.out.printf("POST URL: %s\n", myurl);
+		System.out.printf("POST arguments: %s\n", poststring);
+		
+		// Perform POST
+		String resultJSON = "";
+		try {
+			URL indicoUrl = new URL(myurl);
+			HttpURLConnection con = (HttpURLConnection) indicoUrl.openConnection();
+			con.setRequestMethod("POST");
+			con.setDoInput(true);
+			con.setDoOutput(true);
+			con.setUseCaches(false);
+			
+			// Send request to indico
+			OutputStreamWriter sender = new OutputStreamWriter(con.getOutputStream());
+			sender.write(poststring);
+			sender.flush();
+			
+			// Process answer from the server
+			BufferedReader receiver = new BufferedReader(new InputStreamReader(con.getInputStream()));
+			StringBuilder sb = new StringBuilder();
+			String tmpstring = "";
+			while((tmpstring = receiver.readLine()) != null)
+				sb.append(tmpstring);
+			resultJSON = sb.toString();
+			// TODO: remove output after finish debugging 
+			System.out.printf("Answer from server: %s\n", resultJSON);
+		} catch (MalformedURLException e) {
+			throw new IndicoPostException(String.format("URL %s invalid", myurl));
+		} catch (IOException e) {
+			throw new IndicoPostException("Failed receiving answer from indico server");
+		}
+		
+		// Process answer from the server
+		JSONParser parser = new JSONParser();
+		boolean status = false;
+		try {
+			JSONObject parsedAnswer = (JSONObject)parser.parse(resultJSON);
+			boolean isComplete = (boolean)parsedAnswer.get("complete");
+			if(isComplete){
+				JSONObject resultIndico = (JSONObject)parsedAnswer.get("results");
+				boolean isPaid = (boolean)resultIndico.get("paid");
+				status = isPaid;
+				if(isPaid){
+					double amountPaid = Double.parseDouble(resultIndico.get("amount_paid").toString());
+					reg.getFullInformation().setPaid(isPaid);
+					reg.getFullInformation().setAmountPaid(amountPaid);
+				}
+			} else
+				throw new IndicoPostException("Answer from indico server incomplete");
+		} catch (ParseException e) {
+			throw new IndicoPostException("Failed decoding answer from indico server");
+		}
+		return status;
+	}
+
 
 }
