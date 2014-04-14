@@ -22,6 +22,12 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 public class IndicoAPIConnector {
+	/**
+	 * Class handling communication with the indico server via http
+	 * License: GPLv3 (a copy of the license is provided with the package)
+	 * 
+	 * @author: Markus Fasel
+	 */
 	
 	private String server;
 	private int eventID;

@@ -14,6 +14,9 @@ public class RegistrantListModel extends AbstractTableModel {
 	
 	/**
 	 * Model for table used in the manual search dialog
+	 * License: GPLv3 (a copy of the license is provided with the package)
+	 * 
+	 * @author Markus Fasel
 	 */
 	
 	private class entry implements Comparable{
@@ -52,9 +55,9 @@ public class RegistrantListModel extends AbstractTableModel {
 			 */
 			if(o.getClass() != entry.class) return 1;
 			entry c = (entry)o;
-			if(lastname.compareTo(c.lastname) == 0)
-				return firstname.compareTo(c.firstname);
-			return lastname.compareTo(c.lastname);
+			if(lastname.toLowerCase().compareTo(c.lastname.toLowerCase()) == 0)
+				return firstname.toLowerCase().compareTo(c.firstname.toLowerCase());
+			return lastname.toLowerCase().compareTo(c.lastname.toLowerCase());
 		}
 
 

@@ -12,6 +12,14 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 public class IndicoJSONReglistParser {
+	/**
+	 * Parser class for the registrant list obtained as JSON string from the 
+	 * indico server. Converts registrant list in the program data structure.
+	 * License: GPLv3 (a copy of the license is provided with the package)
+	 * 
+	 * @author: Markus Fasel
+	 */
+	
 	public IndicoEventRegistrantList parseJSONRegistrantList(String str){
 		/*
 		 * Parse JSON string representation of the registrant list

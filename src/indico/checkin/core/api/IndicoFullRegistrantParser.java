@@ -16,6 +16,9 @@ import org.json.simple.parser.ParseException;
 public class IndicoFullRegistrantParser {
 	/**
 	 * Parser for JSON based indico registrant full information
+	 * License: GPLv3 (a copy of the license is provided with the package)
+	 * 
+	 * @author: Markus Fasel
 	 */
 	
 	public IndicoRegistrantFullInformation parseRegistrant(String jsonstring) throws ParseException {

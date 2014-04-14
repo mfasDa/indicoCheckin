@@ -3,7 +3,10 @@ package indico.checkin.core.api;
 public class ETicketDecodingException extends Exception {
 
 	/**
-	 * Exception from the json decoding
+	 * Exception from the json decoding of the indico e-Ticket
+	 * License: GPLv3 (a copy of the license is provided with the package)
+	 * 
+	 * @author: Markus Fasel
 	 */
 	private static final long serialVersionUID = 1L;
 	

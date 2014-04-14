@@ -16,6 +16,9 @@ import org.json.simple.parser.ParseException;
 public class IndicoJSONBarcodeParser {
 	/**
 	 * Class parsing the JSon result from the barcode scan
+	 * License: GPLv3 (a copy of the license is provided with the package)
+	 * 
+	 * @author: Markus Fasel
 	 */
 
 	public IndicoParsedETicket parse(String regjson) throws ETicketDecodingException{
