@@ -26,23 +26,23 @@ public class IndicoFullRegistrantParser {
 		JSONParser parser = new JSONParser();
 		JSONObject parsedRegistrant = (JSONObject)parser.parse(jsonstring);
 		registrant = new IndicoRegistrantFullInformation();
-		Iterator keyIter = parsedRegistrant.entrySet().iterator();
+		Iterator<?> keyIter = parsedRegistrant.entrySet().iterator();
 		while(keyIter.hasNext()){
-			Map.Entry entry = (Map.Entry)keyIter.next();
+			Map.Entry<?,?> entry = (Map.Entry<?,?>)keyIter.next();
 			if(entry.getKey().equals("complete"))
-				registrant.setComplete((boolean)entry.getValue());
+				registrant.setComplete(Boolean.parseBoolean(entry.getValue().toString()));
 			if(entry.getKey().equals("results")){
 				// Iterate over keys in the result section
 				JSONObject registrantResults = (JSONObject)entry.getValue();
-				Iterator resultIter = registrantResults.entrySet().iterator();
+				Iterator<?> resultIter = registrantResults.entrySet().iterator();
 				while(resultIter.hasNext())
-					handleEntry(registrant, (Map.Entry)resultIter.next());
+					handleEntry(registrant, (Map.Entry<?,?>)resultIter.next());
 			}
 		}
 		return registrant;
 	}
 	
-	private void handleEntry(IndicoRegistrantFullInformation registrant, Map.Entry entry){
+	private void handleEntry(IndicoRegistrantFullInformation registrant, Map.Entry<?,?> entry){
 		/*
 		 * Process map entry
 		 * 
@@ -75,11 +75,11 @@ public class IndicoFullRegistrantParser {
 			registrant.setRegistrantID(Long.parseLong(value.toString()));
 		else if(key.equals("miscellaneousGroupList")){
 			JSONArray groups = (JSONArray)value;
-			Iterator groupIter = groups.iterator();
+			Iterator<?> groupIter = groups.iterator();
 			while(groupIter.hasNext()) handleGroup(registrant, (JSONObject)groupIter.next());
 		} else if(key.equals("socialEvents")){
 			JSONArray events = (JSONArray)value;
-			Iterator eventIter = events.iterator();
+			Iterator<?> eventIter = events.iterator();
 			while(eventIter.hasNext()){
 				JSONObject event = (JSONObject)eventIter.next();
 				registrant.createSocialEvent(
@@ -103,7 +103,7 @@ public class IndicoFullRegistrantParser {
 			IndicoRegistrantInfoGroup infogroup = registrant.createInfoGroup((String)group.get("title"), (String)group.get("_fossil"), 
 				(String)group.get("_type"), Long.parseLong(group.get("id").toString()));
 			JSONArray items = (JSONArray)group.get("responseItems");
-			Iterator itemIter = items.iterator();
+			Iterator<?> itemIter = items.iterator();
 			while(itemIter.hasNext()){
 				infogroup.setInfoField(convertResponseItem((JSONObject)itemIter.next()));
 			}

@@ -5,7 +5,6 @@ import indico.checkin.core.data.IndicoRegistrant;
 
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -22,10 +21,10 @@ public class IndicoJSONReglistParser {
 		JSONParser parser = new JSONParser();
 		try {
 			res = new IndicoEventRegistrantList();
-			Map parsed = (Map)parser.parse(str);
-			Iterator piter = parsed.entrySet().iterator();
+			Map<?,?> parsed = (Map<?,?>)parser.parse(str);
+			Iterator<?> piter = parsed.entrySet().iterator();
 			while(piter.hasNext()){
-				Map.Entry en = (Map.Entry)piter.next();
+				Map.Entry<?,?> en = (Map.Entry<?,?>)piter.next();
 				if(!en.getKey().equals("results")){
 					// Metadata
 					res.setMetadata(en.getKey().toString(), en.getValue().toString());
@@ -34,7 +33,7 @@ public class IndicoJSONReglistParser {
 					JSONObject obj = (JSONObject)en.getValue();
 					JSONArray regarray = (JSONArray)obj.get("registrants");
 					
-					Iterator regiter = regarray.iterator();
+					Iterator<?> regiter = regarray.iterator();
 					while(regiter.hasNext()){
 						JSONObject jsonreg = (JSONObject) regiter.next();
 						IndicoRegistrant reg = parseRegistrant(jsonreg);
@@ -52,10 +51,10 @@ public class IndicoJSONReglistParser {
 
 	public IndicoRegistrant parseRegistrant(JSONObject jsonreg){
 		IndicoRegistrant reg = new IndicoRegistrant();
-		Iterator keyIter = jsonreg.entrySet().iterator();
+		Iterator<?> keyIter = jsonreg.entrySet().iterator();
 		while(keyIter.hasNext()){
 			// Process keys and insert them into the registrant
-			Map.Entry en = (Map.Entry)keyIter.next();
+			Map.Entry<?,?> en = (Map.Entry<?,?>)keyIter.next();
 			if(!en.getKey().equals("personal_data")){
 				reg.setRegistrantInformation(en.getKey().toString(), en.getValue().toString());
 			} else {
@@ -64,9 +63,9 @@ public class IndicoJSONReglistParser {
 				JSONObject pobj;
 				try {
 					pobj = (JSONObject)parser.parse(en.getValue().toString());
-					Iterator pIter = pobj.entrySet().iterator();
+					Iterator<?> pIter = pobj.entrySet().iterator();
 					while(pIter.hasNext()){
-						Map.Entry pe = (Map.Entry)pIter.next();
+						Map.Entry<?,?> pe = (Map.Entry<?,?>)pIter.next();
 						reg.setPersonalInformation(pe.getKey().toString(), pe.getValue().toString());
 					}
 				} catch (ParseException e) {
@@ -87,9 +86,9 @@ public class IndicoJSONReglistParser {
 			JSONObject regfull = (JSONObject)parser.parse(jsonstring);
 			JSONObject res = (JSONObject)regfull.get("results");
 			if(res != null){
-				Iterator keyIter = res.entrySet().iterator();
+				Iterator<?> keyIter = res.entrySet().iterator();
 				while(keyIter.hasNext()){
-					Map.Entry en = (Map.Entry)keyIter.next();
+					Map.Entry<?,?> en = (Map.Entry<?,?>)keyIter.next();
 					String key = (String) en.getKey();
 					System.out.println("Key: "+ key);
 					if(en.getValue() != null)

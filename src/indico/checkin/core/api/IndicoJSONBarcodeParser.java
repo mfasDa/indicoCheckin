@@ -32,21 +32,21 @@ public class IndicoJSONBarcodeParser {
 			ContainerFactory fact = new ContainerFactory(){
 
 				@Override
-				public List creatArrayContainer() {
-					return new LinkedList();
+				public List<?> creatArrayContainer() {
+					return new LinkedList<>();
 				}
 
 				@Override
-				public Map createObjectContainer() {
+				public Map<?,?> createObjectContainer() {
 					return new LinkedHashMap<>();
 				}
 				
 			};
 			try{
-				Map parsed = (Map)parser.parse(regjson, fact);
-				Iterator pIter = parsed.entrySet().iterator();
+				Map<?,?> parsed = (Map<?,?>)parser.parse(regjson, fact);
+				Iterator<?> pIter = parsed.entrySet().iterator();
 				while(pIter.hasNext()){
-					Map.Entry en = (Map.Entry)pIter.next();
+					Map.Entry<?,?> en = (Map.Entry<?,?>)pIter.next();
 					String key = (String)en.getKey();
 					if(key.equals("event_id")){
 						reg.setEventID((String)en.getValue());

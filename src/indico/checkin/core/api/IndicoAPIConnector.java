@@ -2,7 +2,6 @@ package indico.checkin.core.api;
 
 import indico.checkin.core.data.IndicoEventRegistrantList;
 import indico.checkin.core.data.IndicoRegistrant;
-import indico.checkin.core.data.IndicoRegistrantFullInformation;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
