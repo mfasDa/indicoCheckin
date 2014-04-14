@@ -17,6 +17,9 @@ public class IndicoJSONReglistParser {
 	 * indico server. Converts registrant list in the program data structure.
 	 * License: GPLv3 (a copy of the license is provided with the package)
 	 * 
+	 * Clas depending on additional library:
+	 *   json-simple, published under Apache License 2.0 (attached to the package)
+	 * 
 	 * @author: Markus Fasel
 	 */
 	

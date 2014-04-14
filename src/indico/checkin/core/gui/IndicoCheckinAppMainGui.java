@@ -26,6 +26,7 @@ import javax.swing.JPanel;
 public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, WindowListener {
 	/**
 	 * Class respresenting the main window of the checkin app GUI
+	 * License: GPLv3 (a copy of the license is provided with the package)
 	 * 
 	 * @author: Markus Fasel
 	 */

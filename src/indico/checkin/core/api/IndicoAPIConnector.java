@@ -26,6 +26,9 @@ public class IndicoAPIConnector {
 	 * Class handling communication with the indico server via http
 	 * License: GPLv3 (a copy of the license is provided with the package)
 	 * 
+	 * Class depending on additional library:
+	 *   json-simple, published under Apache License (attached to the package)
+	 * 
 	 * @author: Markus Fasel
 	 */
 	

@@ -17,7 +17,11 @@ import javax.swing.SwingConstants;
 public class IndicoAPIInfoDialog extends JDialog{
 
 	/**
+	 * Shows a dialog with several user information (server url, event ID, api key
+	 * and secret)
+	 * License: GPLv3 (a copy of the license is provided with the package)
 	 * 
+	 * @author: Markus Fasel
 	 */
 	private static final long serialVersionUID = 1L;
 	

@@ -17,6 +17,18 @@ import com.google.zxing.common.HybridBinarizer;
 
 public class IndicoBarcodeHandler {
 	
+	/**
+	 * Class handling reading of the barcode. The class tries to catch a webcam
+	 * picture
+	 * License: GPLv3 (a copy of the license is provided with the package)
+	 * 
+	 * Class dependent on additional libraries:
+	 *   webcam-capture (license attached to the package)
+	 *   zxing published under Apache License v2 (attached to the package)
+	 * 
+	 * @author: Markus Fasel
+	 */
+	
 	String barcode;
 	
 	public IndicoBarcodeHandler(){

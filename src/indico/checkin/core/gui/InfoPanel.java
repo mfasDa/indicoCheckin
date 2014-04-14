@@ -20,6 +20,9 @@ public class InfoPanel extends JPanel{
 	 * - a table showing the registrant details. This table is updated when the
 	 *   a new registrant is processed.
 	 * License: GPLv3 (a copy of the license is provided with the package)
+	 * 
+	 * Class dependent on additional libraries:
+	 *   webcam-capture (license attached to the package)
 	 *  
 	 * @author Markus Fasel
 	 */

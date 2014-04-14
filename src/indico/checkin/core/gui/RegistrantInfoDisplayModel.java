@@ -7,7 +7,11 @@ import javax.swing.table.AbstractTableModel;
 public class RegistrantInfoDisplayModel extends AbstractTableModel {
 
 	/**
-	 * Model for table display
+	 * Model for table display, defining the information which has to be shown in
+	 * the registrant info display
+	 * License: GPLv3 (a copy of the license is provided with the package)
+	 * 
+	 * @author: Markus Fasel
 	 */
 	private static final long serialVersionUID = 1L;
 	private IndicoRegistrant registrant;

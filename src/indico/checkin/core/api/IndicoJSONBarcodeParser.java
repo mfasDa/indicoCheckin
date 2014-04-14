@@ -18,6 +18,9 @@ public class IndicoJSONBarcodeParser {
 	 * Class parsing the JSon result from the barcode scan
 	 * License: GPLv3 (a copy of the license is provided with the package)
 	 * 
+	 * Class depending on additional library:
+	 *   json-simple, published under Apache License v2 (attached to the package)
+	 * 
 	 * @author: Markus Fasel
 	 */
 

@@ -18,6 +18,9 @@ public class IndicoFullRegistrantParser {
 	 * Parser for JSON based indico registrant full information
 	 * License: GPLv3 (a copy of the license is provided with the package)
 	 * 
+	 * Class depending on additional library
+	 *   json-simple, published under Apache License 2.0
+	 * 
 	 * @author: Markus Fasel
 	 */
 	
