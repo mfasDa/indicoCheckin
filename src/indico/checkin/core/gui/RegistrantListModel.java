@@ -19,7 +19,7 @@ public class RegistrantListModel extends AbstractTableModel {
 	 * @author Markus Fasel
 	 */
 	
-	private class entry implements Comparable{
+	private class entry implements Comparable<entry>{
 		private String lastname;
 		private String firstname;
 		private String affiliation;
@@ -59,15 +59,13 @@ public class RegistrantListModel extends AbstractTableModel {
 		}
 
 		@Override
-		public int compareTo(Object o) {
+		public int compareTo(entry o) {
 			/*
 			 * Comparison method
 			 */
-			if(o.getClass() != entry.class) return 1;
-			entry c = (entry)o;
-			if(lastname.toLowerCase().compareTo(c.lastname.toLowerCase()) == 0)
-				return firstname.toLowerCase().compareTo(c.firstname.toLowerCase());
-			return lastname.toLowerCase().compareTo(c.lastname.toLowerCase());
+			if(lastname.toLowerCase().compareTo(o.lastname.toLowerCase()) == 0)
+				return firstname.toLowerCase().compareTo(o.firstname.toLowerCase());
+			return lastname.toLowerCase().compareTo(o.lastname.toLowerCase());
 		}
 
 		public boolean MatchBeginningLastName(String str){
@@ -78,6 +76,7 @@ public class RegistrantListModel extends AbstractTableModel {
 			if(lastnamesub.equals(str.toLowerCase())) return true;
 			else return false;
 		}
+
 	}
 
 	private static final long serialVersionUID = 1L;
@@ -217,7 +216,6 @@ public class RegistrantListModel extends AbstractTableModel {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	private void buildEntryList(){
 		entrylist.clear();
 		Iterator<IndicoRegistrant> regIter = data.getRegistrantList().iterator();
