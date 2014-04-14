@@ -40,7 +40,7 @@ public class InfoPanel extends JPanel{
 		tablemodel = new RegistrantInfoDisplayModel();
 		userdata = new JTable(tablemodel);
 		userdata.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		userdata.getColumnModel().getColumn(0).setPreferredWidth(125);
+		userdata.getColumnModel().getColumn(0).setPreferredWidth(175);
 		userdata.getColumnModel().getColumn(1).setPreferredWidth(200);		
 		this.add(userdata, BorderLayout.EAST);
 	}

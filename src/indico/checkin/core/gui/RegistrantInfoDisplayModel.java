@@ -1,6 +1,8 @@
 package indico.checkin.core.gui;
 
 import indico.checkin.core.data.IndicoRegistrant;
+import indico.checkin.core.data.IndicoRegistrantInfoField;
+import indico.checkin.core.data.IndicoRegistrantInfoGroup;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -22,7 +24,7 @@ public class RegistrantInfoDisplayModel extends AbstractTableModel {
 
 	@Override
 	public int getRowCount() {
-		return 6;
+		return 8;
 	}
 
 	@Override
@@ -32,7 +34,7 @@ public class RegistrantInfoDisplayModel extends AbstractTableModel {
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		String rowTitles[] = {"Last Name:", "First Name:", "Registrant ID:", "Paid:", "Checked in:", "Price:"};
+		String rowTitles[] = {"Last Name:", "First Name:", "Registrant ID:", "Paid:", "Checked in:", "Price:", "Amount Paid:", "Places for conference dinner;"};
 		if(columnIndex == 0){
 			return rowTitles[rowIndex];
 		} else {
@@ -57,6 +59,18 @@ public class RegistrantInfoDisplayModel extends AbstractTableModel {
 				case 5:
 					entry = String.format("EUR %.2f", registrant.getFullPrice());
 					break;
+				case 6:
+					entry = String.format("EUR %.2f", registrant.getFullInformation().getAmountPaid());
+					break;
+				case 7:
+					// This is a special field for the quark matter conference (up to now)
+					IndicoRegistrantInfoGroup dinnergroup = registrant.getFullInformation().findGroupByTitle("Lunch and conference dinner options");
+					IndicoRegistrantInfoField selffield = dinnergroup.findFieldByCaption("Conference Dinner (included in the conference fee)");
+					int nparticipants = selffield.getValue().contains("Yes") ? 1 : 0;
+					// check also accompanying person
+					IndicoRegistrantInfoField accompanyField = dinnergroup.findFieldByCaption("Accompanying person conference dinner");
+					nparticipants += accompanyField.getValue().length() > 0 ? Integer.parseInt(accompanyField.getValue()) : 0;
+					entry = String.format("%d", nparticipants);
 				}
 			}
 			return entry;

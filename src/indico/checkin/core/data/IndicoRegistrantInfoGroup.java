@@ -64,7 +64,16 @@ public class IndicoRegistrantInfoGroup {
 	}
 	
 	public IndicoRegistrantInfoField findFieldByCaption(String caption){
-		return null;
+		IndicoRegistrantInfoField result = null;
+		Iterator <IndicoRegistrantInfoField> fieldIter = data.iterator();
+		while(fieldIter.hasNext()){
+			IndicoRegistrantInfoField tmp = fieldIter.next();
+			if(tmp.getCaption().toLowerCase().equals(caption.toLowerCase())){
+				result = tmp;
+				break;
+			}
+		}
+		return result;
 	}
 	
 	public IndicoRegistrantInfoField createInfoField(String caption){
