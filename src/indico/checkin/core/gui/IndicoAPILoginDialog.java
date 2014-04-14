@@ -19,7 +19,14 @@ import javax.swing.JTextField;
 public class IndicoAPILoginDialog extends JDialog{
 
 	/**
+	 * GUI of the login dialog. Registrants enter the server url,
+	 * the conference ID and the api key and secret. The information
+	 * is passed to the mother window which establishes a connection
+	 * and fetches the full dataset.
 	 * 
+	 * License: GPLv3 (a copy of the license is provided with the package)
+	 *  
+	 * @author Markus Fasel
 	 */
 	private static final long serialVersionUID = 1L;
 	

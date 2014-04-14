@@ -1,5 +1,7 @@
 package indico.checkin.core.gui;
 
+import indico.checkin.core.data.IndicoRegistrant;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -9,29 +11,48 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-public class ManualSearchDialog extends JDialog implements ListSelectionListener{
+public class ManualSearchDialog extends JDialog implements ListSelectionListener,DocumentListener{
 
 	/**
-	 * Dailog for manual search of a registrant
+	 * Dailog for manual search of a registrant. Users can select an entry in the list
+	 * of entries.
+	 * License: GPLv3 (a copy of the license is provided with the package)
+	 * 
+	 * @author; Markus Fasel
 	 */
 	private static final long serialVersionUID = 1L;
 	
 	private JTable registrantDisplay;
+	private JTextField searchField;
 	private JButton confirmButton;
-	private boolean entrySelected;
+	private RegistrantListModel tableModel;
+	private IndicoRegistrant selected;
 	
 	public ManualSearchDialog(JFrame parent, RegistrantListModel dataModel){
 		super(parent, "Select registrant", true);
 		this.setPreferredSize(new Dimension(700, 400));
-		entrySelected = false;
 		
-		registrantDisplay = new JTable(dataModel);
+		JPanel findPanel = new JPanel();
+		findPanel.setLayout(new FlowLayout());
+		JLabel findLabel = new JLabel("Find by lastname:");
+		findPanel.add(findLabel);
+		searchField = new JTextField(30);
+		searchField.getDocument().addDocumentListener(this);
+		findPanel.add(searchField);
+				
+		tableModel = dataModel;
+		registrantDisplay = new JTable(tableModel);
 		registrantDisplay.getColumnModel().getColumn(0).setPreferredWidth(200);
 		registrantDisplay.getColumnModel().getColumn(1).setPreferredWidth(200);		
 		registrantDisplay.getColumnModel().getColumn(2).setPreferredWidth(400);
@@ -44,12 +65,16 @@ public class ManualSearchDialog extends JDialog implements ListSelectionListener
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.printf("Row selected: %s\n", registrantDisplay.getSelectedRow());
 				if(registrantDisplay.getSelectedRow() > -1){
-					entrySelected = true;
-					System.out.println("A row was selected");
+					try {
+						selected = tableModel.getSelectedRegistrantForRow(registrantDisplay.getSelectedRow());
+					} catch (EntryListBoundaryException e1) {
+						JOptionPane.showMessageDialog(ManualSearchDialog.this, "Error in accessing registrant");
+					}
 				} 
-				// otherwise no entry selected();
+				// otherwise no entry selected
+				// in any case set all entries to selected again
+				tableModel.selectAll(); 
 				dispose();
 			}
 		});
@@ -62,7 +87,8 @@ public class ManualSearchDialog extends JDialog implements ListSelectionListener
 				/*
 				 * Cancel button, no entry selected
 				 */
-				entrySelected = false;
+				selected = null;
+				tableModel.selectAll();
 				dispose();
 			}
 		});
@@ -72,21 +98,18 @@ public class ManualSearchDialog extends JDialog implements ListSelectionListener
 		buttonPanel.add(confirmButton);
 		buttonPanel.add(cancelButton);
 		
+		this.getContentPane().add(findPanel, BorderLayout.NORTH);
 		this.getContentPane().add(new JScrollPane(registrantDisplay), BorderLayout.CENTER);
 		this.getContentPane().add(buttonPanel, BorderLayout.PAGE_END);
 		this.pack();
 	}
 
-	public boolean isEntrySelected() {
-		return entrySelected;
-	}
-
-	public void setEntrySelected(boolean entrySelected) {
-		this.entrySelected = entrySelected;
+	public IndicoRegistrant getSelectedRegistrant(){
+		return selected;
 	}
 	
-	public int getSelectedRow(){
-		return registrantDisplay.getSelectedRow();
+	public boolean isEntrySelected(){
+		return selected != null;
 	}
 
 	@Override
@@ -96,4 +119,28 @@ public class ManualSearchDialog extends JDialog implements ListSelectionListener
 		 */
 		confirmButton.setEnabled(true);
 	}
+
+	@Override
+	public void insertUpdate(DocumentEvent e) {
+		handleTextfieldChange();
+	}
+
+	@Override
+	public void removeUpdate(DocumentEvent e) {
+		handleTextfieldChange();
+	}
+
+	@Override
+	public void changedUpdate(DocumentEvent e) {
+		handleTextfieldChange();
+	}
+	
+	private void handleTextfieldChange(){
+		/*
+		 *when a textfield changed, update selection in the table model and fire table update
+		 */
+		System.out.printf("Content of the text field: %s\n", searchField.getText());
+		tableModel.UpdateSelected(searchField.getText());
+		tableModel.fireTableDataChanged();
+	} 
 }

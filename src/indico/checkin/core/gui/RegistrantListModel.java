@@ -24,6 +24,7 @@ public class RegistrantListModel extends AbstractTableModel {
 		private String firstname;
 		private String affiliation;
 		private long id;
+		private boolean selected;
 
 		public String getLastname() {
 			return lastname;
@@ -41,11 +42,20 @@ public class RegistrantListModel extends AbstractTableModel {
 			return id;
 		}
 
+		public boolean isSelected() {
+			return selected;
+		}
+
+		public void setSelected(boolean selected) {
+			this.selected = selected;
+		}
+
 		public entry(String lastname, String firstname, String affiliation, long l){
 			this.lastname = lastname;
 			this.firstname = firstname;
 			this.affiliation = affiliation;
 			this.id = l;
+			this.selected = true;
 		}
 
 		@Override
@@ -60,7 +70,14 @@ public class RegistrantListModel extends AbstractTableModel {
 			return lastname.toLowerCase().compareTo(c.lastname.toLowerCase());
 		}
 
-
+		public boolean MatchBeginningLastName(String str){
+			/*
+			 * checks if the last name starts with the given string
+			 */
+			String lastnamesub = lastname.substring(0, str.length()).toLowerCase();
+			if(lastnamesub.equals(str.toLowerCase())) return true;
+			else return false;
+		}
 	}
 
 	private static final long serialVersionUID = 1L;
@@ -75,7 +92,9 @@ public class RegistrantListModel extends AbstractTableModel {
 
 	@Override
 	public int getRowCount() {
-		return data.getNumberOfRegistrants();
+		// count number of selected entries
+		int nrow = getNumberOfSelectedEntries();
+		return nrow;
 	}
 
 	@Override
@@ -89,7 +108,12 @@ public class RegistrantListModel extends AbstractTableModel {
 		 * Selects registrant for a given row
 		 * returns information for the given col
 		 */
-		entry en = entrylist.get(rowIndex);
+		entry en = null;
+		try{
+			en = getSelectedEntryAt(rowIndex);
+		} catch (EntryListBoundaryException e){
+			return "";
+		}
 		String result = "";
 		switch(columnIndex){
 		case 0:
@@ -130,10 +154,67 @@ public class RegistrantListModel extends AbstractTableModel {
 		}
 		return result;
 	}
+	
+	public entry getSelectedEntryAt(int index) throws EntryListBoundaryException{
+		/*
+		 * returns the entry at index index in the list of selected entries
+		 */
+		int nsel = getNumberOfSelectedEntries();
+		if(index >= nsel)
+			throw new EntryListBoundaryException(nsel, index);
+		entry result = null;
+		int count = 0;
+		Iterator<entry> entryIter = entrylist.iterator();
+		while(entryIter.hasNext()){
+			entry tmp = entryIter.next();
+			if(tmp.isSelected()){
+				if(index == count){
+					result = tmp;
+					break;
+				} else count++;
+			}
+		}
+		return result;
+	}
+	
+	public int getNumberOfSelectedEntries(){
+		/*
+		 * returns the number of selected entries
+		 */
+		int nentries = 0;
+		Iterator<entry> it = entrylist.iterator();
+		while(it.hasNext()){
+			if(it.next().isSelected()) nentries++;
+		}
+		return nentries;
+	}
 
 	public void setData(IndicoEventRegistrantList data){
 		this.data = data;
 		buildEntryList();
+	}
+	
+	public void selectAll(){
+		/*
+		 * Mark all entries as selected
+		 */
+		Iterator<entry> it = entrylist.iterator();
+		while(it.hasNext())
+			it.next().setSelected(true);
+	}
+	
+	void UpdateSelected(String strtomatch){
+		/*
+		 * Selects all entries where the lastname starts with the given substring
+		 */
+		Iterator<entry> it = entrylist.iterator();
+		while(it.hasNext()){
+			entry en = it.next();
+			if(en.MatchBeginningLastName(strtomatch)){
+				en.setSelected(true);
+			}
+			else en.setSelected(false);
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -152,5 +233,15 @@ public class RegistrantListModel extends AbstractTableModel {
 		 * Get the matching registrant for a given row
 		 */
 		return data.getRegistrantById(entrylist.get(row).getId());
+	}
+	
+	public IndicoRegistrant getSelectedRegistrantForRow(int row) throws EntryListBoundaryException{
+		/*
+		 * get the matching registrant, which is also marked as selected, 
+		 * for a given row
+		 */
+		IndicoRegistrant reg = null;
+		reg = data.getRegistrantById(getSelectedEntryAt(row).getId());
+		return reg;
 	}
 }

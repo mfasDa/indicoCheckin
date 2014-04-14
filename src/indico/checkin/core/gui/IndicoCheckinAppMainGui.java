@@ -411,7 +411,8 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		ManualSearchDialog searchDialog = new ManualSearchDialog(this, manualSearchModel);
 		searchDialog.setVisible(true);
 		if(searchDialog.isEntrySelected()){
-			current = manualSearchModel.getRegistrantForRow(searchDialog.getSelectedRow());
+			current = searchDialog.getSelectedRegistrant();
+			//current = manualSearchModel.getRegistrantForRow(searchDialog.getSelectedRow());
 			if(current != null){
 				try{
 					this.indicoConnection.fetchFullRegistrantInformation(current);

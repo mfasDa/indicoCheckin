@@ -11,8 +11,17 @@ import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamPanel;
 
 public class InfoPanel extends JPanel{
+	
 	/**
-	 * 
+	 * Class for user info panel in the main window. The panel contains two
+	 * parts:
+	 * - a webcam window where the current webcam picture is shown, so that the 
+	 *   user can put the ticket in a way that the barcode can be easily read in
+	 * - a table showing the registrant details. This table is updated when the
+	 *   a new registrant is processed.
+	 * License: GPLv3 (a copy of the license is provided with the package)
+	 *  
+	 * @author Markus Fasel
 	 */
 	private static final long serialVersionUID = 1L;
 	WebcamPanel webcampanel;
