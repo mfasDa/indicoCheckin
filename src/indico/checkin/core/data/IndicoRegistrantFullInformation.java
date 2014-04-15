@@ -12,6 +12,9 @@ import java.util.List;
 public class IndicoRegistrantFullInformation {
 	/**
 	 * Container object for full registrant information
+	 * License: GPLv3 (a copy of the license is provided with the package)
+	 * 
+	 * @author: Markus Fasel
 	 */
 	List<IndicoRegistrantInfoGroup> miscallaneousGroups;
 	List<IndicoRegistrantSocialEvent> socialEvents;

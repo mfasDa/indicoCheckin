@@ -20,6 +20,7 @@ public class DinnerInfoDialog extends JDialog {
 
 	/**
 	 * Info dialog for conference dinner options
+	 * License: GPLv3 (a copy of the license is provided with the package)
 	 * 
 	 * @author: Markus Fasel
 	 */

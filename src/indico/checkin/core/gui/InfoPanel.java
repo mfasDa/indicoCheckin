@@ -73,9 +73,15 @@ public class InfoPanel extends JPanel implements ListSelectionListener{
 		/*
 		 * Open info dialog
 		 */
-		if(userdata.getSelectedRow() == 7){
+		switch(userdata.getSelectedRow()){
+		case 7:
 			DinnerInfoDialog dinnerdialog = new DinnerInfoDialog(parentFrame,tablemodel.getData());
 			dinnerdialog.setVisible(true);
+			break;
+		case 8:
+			SocialEventInfoDialog eventDialog = new SocialEventInfoDialog(parentFrame,tablemodel.getData().getFullInformation().getSocialEvents());
+			eventDialog.setVisible(true);
+			break;
 		}
 	}
 }
