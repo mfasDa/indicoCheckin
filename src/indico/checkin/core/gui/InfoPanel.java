@@ -4,13 +4,16 @@ import indico.checkin.core.data.IndicoRegistrant;
 
 import java.awt.BorderLayout;
 
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamPanel;
 
-public class InfoPanel extends JPanel{
+public class InfoPanel extends JPanel implements ListSelectionListener{
 	
 	/**
 	 * Class for user info panel in the main window. The panel contains two
@@ -29,10 +32,12 @@ public class InfoPanel extends JPanel{
 	private static final long serialVersionUID = 1L;
 	WebcamPanel webcampanel;
 	JTable userdata;
+	JFrame parentFrame;
 	RegistrantInfoDisplayModel tablemodel;
 	
-	public InfoPanel(){
+	public InfoPanel(JFrame parentFrame){
 		this.setLayout(new BorderLayout());
+		this.parentFrame = parentFrame;
 		webcampanel = new WebcamPanel(Webcam.getDefault());
 		webcampanel.setSize(600, 400);
 		this.add(webcampanel, BorderLayout.WEST);
@@ -43,6 +48,7 @@ public class InfoPanel extends JPanel{
 		userdata.getColumnModel().getColumn(0).setPreferredWidth(175);
 		userdata.getColumnModel().getColumn(1).setPreferredWidth(200);	
 		userdata.setDefaultRenderer(Object.class, new RegistrantInfoRenderer());
+		userdata.getSelectionModel().addListSelectionListener(this);
 		this.add(userdata, BorderLayout.EAST);
 	}
 	
@@ -60,5 +66,16 @@ public class InfoPanel extends JPanel{
 
 	public void UpdateRegistrantDisplay() {
 		tablemodel.setInfoUpdated();
+	}
+
+	@Override
+	public void valueChanged(ListSelectionEvent e) {
+		/*
+		 * Open info dialog
+		 */
+		if(userdata.getSelectedRow() == 7){
+			DinnerInfoDialog dinnerdialog = new DinnerInfoDialog(parentFrame,tablemodel.getData());
+			dinnerdialog.setVisible(true);
+		}
 	}
 }

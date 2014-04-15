@@ -81,7 +81,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		this.addWindowListener(this);
 		
-		infopanel = new InfoPanel();
+		infopanel = new InfoPanel(this);
 		
 		// Define Panel for admin buttons
 		JPanel userButtonPanel = new JPanel(new GridBagLayout());

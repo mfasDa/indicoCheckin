@@ -77,6 +77,10 @@ public class RegistrantInfoDisplayModel extends AbstractTableModel {
 		}
 	}
 	
+	public IndicoRegistrant getData(){
+		return registrant;
+	}
+	
 	public void SetRegistrant(IndicoRegistrant reg){
 		registrant = reg;
 		this.fireTableRowsUpdated(0, 4);
