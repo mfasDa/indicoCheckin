@@ -38,7 +38,7 @@ public class RegistrantInfoDisplayModel extends AbstractTableModel {
 		if(columnIndex == 0){
 			return rowTitles[rowIndex];
 		} else {
-			String entry = "";
+			Object entry = "";
 			if(registrant != null){
 				switch(rowIndex){
 				case 0: 
@@ -51,10 +51,10 @@ public class RegistrantInfoDisplayModel extends AbstractTableModel {
 					entry = String.format("%d", registrant.getID());
 					break;
 				case 3:
-					entry = registrant.hasPaid() ? "yes" : "no";
+					entry = new Boolean(registrant.hasPaid());
 					break;
 				case 4:
-					entry = registrant.hasCheckedIn() ? "yes" : "no";
+					entry = new Boolean(registrant.hasCheckedIn());
 					break;
 				case 5:
 					entry = String.format("EUR %.2f", registrant.getFullPrice());
