@@ -22,6 +22,8 @@ import javax.swing.JFrame;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, WindowListener {
 	/**
@@ -59,6 +61,13 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 	
 	public IndicoCheckinAppMainGui(){
 		// Default constructor
+		
+		try {
+			// Set the look and feel to the system look and feel
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		} 
 		this.getContentPane().setLayout(null);
 		this.initWindow();
 		
