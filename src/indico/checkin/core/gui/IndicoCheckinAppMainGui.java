@@ -23,7 +23,6 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 
 public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, WindowListener {
 	/**
@@ -51,7 +50,6 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 	private IndicoEventRegistrantList registrants;
 	private IndicoParsedETicket eticket;
 	private IndicoRegistrant current;
-	private IndicoBarcodeHandler barcodeHandler;
 	private RegistrantListModel manualSearchModel;
 	
 	private boolean isLoggedIn;
@@ -74,7 +72,6 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		registrants = null;
 		current = null;
 		indicoConnection = new IndicoAPIConnector();
-		barcodeHandler = new IndicoBarcodeHandler();
 		newregthread = null;
 		
 		isLoggedIn = false;
@@ -372,16 +369,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		this.generateTicketButton.setEnabled(false);
 		eticket = null;
 		current = null;
-		newregthread = new Thread(){
-			@Override
-			public void run(){
-				eticket = barcodeHandler.handleBarcode();
-				if(eticket != null)
-					handleEticketParsed();
-				else
-					handleParserFailure();
-			}
-		};
+		newregthread = new Thread(new Webcamcatcher(this));
 		newregthread.start();
 	}
 	
@@ -512,18 +500,8 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		} else {
 			JOptionPane.showMessageDialog(this, "Invalid ETicket");
 		}
-		finishBarcodeThread();
 	}
-	
-	public void handleParserFailure(){
-		/*
-		 * Parsing was not successfull:
-		 * Kill thread and show an error message
-		 */
-		JOptionPane.showMessageDialog(this, "Failed scanning barcode");
-		finishBarcodeThread();
-	}
-	
+		
 	public void handleCancel(){
 		/*
 		 * User pressed cancel:
@@ -549,5 +527,18 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 			newregthread.interrupt();
 			newregthread = null;
 		}
+	}
+	
+	public void setTicket(IndicoParsedETicket ticket){
+		eticket = ticket;
+		if(eticket != null)
+			handleEticketParsed();
+		else
+			JOptionPane.showMessageDialog(this, "Failed reading eticket");
+		if(isLoggedIn) this.newUserButton.setEnabled(true);
+	}
+	
+	public InfoPanel getInfoPanel(){
+		return infopanel;
 	}
 }

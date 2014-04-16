@@ -3,6 +3,7 @@ package indico.checkin.core.gui;
 import indico.checkin.core.data.IndicoRegistrant;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -11,7 +12,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import com.github.sarxos.webcam.Webcam;
-import com.github.sarxos.webcam.WebcamPanel;
 
 public class InfoPanel extends JPanel implements ListSelectionListener{
 	
@@ -30,7 +30,7 @@ public class InfoPanel extends JPanel implements ListSelectionListener{
 	 * @author Markus Fasel
 	 */
 	private static final long serialVersionUID = 1L;
-	WebcamPanel webcampanel;
+	WebcamImagePanel webcampanel;
 	JTable userdata;
 	JFrame parentFrame;
 	RegistrantInfoDisplayModel tablemodel;
@@ -38,8 +38,8 @@ public class InfoPanel extends JPanel implements ListSelectionListener{
 	public InfoPanel(JFrame parentFrame){
 		this.setLayout(new BorderLayout());
 		this.parentFrame = parentFrame;
-		webcampanel = new WebcamPanel(Webcam.getDefault());
-		webcampanel.setSize(600, 400);
+		webcampanel = new WebcamImagePanel(Webcam.getDefault());
+		//webcampanel.setPreferredSize(new Dimension(600, 400));
 		this.add(webcampanel, BorderLayout.WEST);
 		
 		tablemodel = new RegistrantInfoDisplayModel();
@@ -52,7 +52,7 @@ public class InfoPanel extends JPanel implements ListSelectionListener{
 		this.add(userdata, BorderLayout.EAST);
 	}
 	
-	public JPanel getWebcamPanel(){
+	public WebcamImagePanel getWebcamPanel(){
 		return webcampanel;
 	}
 	
@@ -84,4 +84,5 @@ public class InfoPanel extends JPanel implements ListSelectionListener{
 			break;
 		}
 	}
+	
 }
