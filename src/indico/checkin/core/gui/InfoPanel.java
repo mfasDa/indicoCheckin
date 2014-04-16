@@ -3,7 +3,6 @@ package indico.checkin.core.gui;
 import indico.checkin.core.data.IndicoRegistrant;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
