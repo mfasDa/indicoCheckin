@@ -110,7 +110,6 @@ public class IndicoAPIConnector {
 	 * @throws RegistrantListFetchingException
 	 */
 	public IndicoEventRegistrantList fetchRegistrantList() throws RegistrantListFetchingException{
-		System.out.println("IAMHERE");
 		String contenturl = String.format("%s/export/event/%d/registrants.json", this.server, this.getEventID());
 		Map<String,String> params = new TreeMap<String,String>(); 
 		IndicoEventRegistrantList reglist = null;
