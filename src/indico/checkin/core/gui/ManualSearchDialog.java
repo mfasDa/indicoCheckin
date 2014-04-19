@@ -1,3 +1,19 @@
+/****************************************************************************
+ *  Copyright (C) 2014  Markus Fasel <markus.fasel@cern.ch>                 *
+ *                                                                          * 
+ *  This program is free software: you can redistribute it and/or modify    *
+ *  it under the terms of the GNU General Public License as published by    *
+ *  the Free Software Foundation, either version 3 of the License, or       *
+ *  (at your option) any later version.                                     *
+ *                                                                          *
+ *  This program is distributed in the hope that it will be useful,         *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of          *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the           *
+ *  GNU General Public License for more details.                            *
+ *                                                                          *
+ *  You should have received a copy of the GNU General Public License       *
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
+ ****************************************************************************/
 package indico.checkin.core.gui;
 
 import indico.checkin.core.data.IndicoRegistrant;
@@ -22,15 +38,14 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+/**
+ * Dailog for manual search of a registrant. Users can select an entry in the list
+ * of entries.
+ * 
+ * @author; Markus Fasel
+ */
 public class ManualSearchDialog extends JDialog implements ListSelectionListener,DocumentListener{
 
-	/**
-	 * Dailog for manual search of a registrant. Users can select an entry in the list
-	 * of entries.
-	 * License: GPLv3 (a copy of the license is provided with the package)
-	 * 
-	 * @author; Markus Fasel
-	 */
 	private static final long serialVersionUID = 1L;
 	
 	private JTable registrantDisplay;

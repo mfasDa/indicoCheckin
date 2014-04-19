@@ -1,3 +1,19 @@
+/****************************************************************************
+ *  Copyright (C) 2014  Markus Fasel <markus.fasel@cern.ch>                 *
+ *                                                                          * 
+ *  This program is free software: you can redistribute it and/or modify    *
+ *  it under the terms of the GNU General Public License as published by    *
+ *  the Free Software Foundation, either version 3 of the License, or       *
+ *  (at your option) any later version.                                     *
+ *                                                                          *
+ *  This program is distributed in the hope that it will be useful,         *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of          *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the           *
+ *  GNU General Public License for more details.                            *
+ *                                                                          *
+ *  You should have received a copy of the GNU General Public License       *
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
+ ****************************************************************************/
 package indico.checkin.core.data;
 
 import java.text.DateFormat;
@@ -8,14 +24,16 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-
+/**
+ * Container object for full registrant information.
+ * Used inside the indico registrant:
+ * Full information consists of a list of groups, which themselves 
+ * contain a list of fields. Groups are build as in the indico
+ * registration form.
+ * 
+ * @author: Markus Fasel
+ */
 public class IndicoRegistrantFullInformation {
-	/**
-	 * Container object for full registrant information
-	 * License: GPLv3 (a copy of the license is provided with the package)
-	 * 
-	 * @author: Markus Fasel
-	 */
 	List<IndicoRegistrantInfoGroup> miscallaneousGroups;
 	List<IndicoRegistrantSocialEvent> socialEvents;
 	private String type;
@@ -30,6 +48,9 @@ public class IndicoRegistrantFullInformation {
 	private Date registrationDate;
 	private Date checkinDate;
 	
+	/**
+	 * Default constructor
+	 */
 	public IndicoRegistrantFullInformation(){
 		miscallaneousGroups = new LinkedList<IndicoRegistrantInfoGroup>();
 		socialEvents = new LinkedList<IndicoRegistrantSocialEvent>();
@@ -45,37 +66,50 @@ public class IndicoRegistrantFullInformation {
 		checkinDate = null;
 	}
 	
+	/**
+	 * Add info group to the list of groups
+	 * 
+	 * @param group
+	 */
 	public void AddInfoGroup(IndicoRegistrantInfoGroup group){
-		/*
-		 * Add info group to the list of groups
-		 */
 		miscallaneousGroups.add(group);
 	}
 	
+	/**
+	 * Add social event to the list of social events
+	 * 
+	 * @param event
+	 */
 	public void AddSocialEvent(IndicoRegistrantSocialEvent event){
-		/*
-		 * Add social event to the list of social events
-		 */
 		socialEvents.add(event);
 	}
 	
+	/**
+	 * Create new info group with a title and add it to the list of 
+	 * groups
+	 * 
+	 * @param title
+	 * @return the new info group
+	 */
 	public IndicoRegistrantInfoGroup createInfoGroup(String title){
-		/*
-		 * Create new info group with a title and add it to the list of 
-		 * groups
-		 */
 		IndicoRegistrantInfoGroup group = new IndicoRegistrantInfoGroup();
 		group.setTitle(title);
 		AddInfoGroup(group);
 		return group;
 	}
 	
+	/**
+	  * Create new info group with a title and add it to the list of 
+	 * groups
+	 *
+	 * @param title
+	 * @param fossil
+	 * @param type
+	 * @param id
+	 * @return the new info group
+	 */
 	public IndicoRegistrantInfoGroup createInfoGroup(String title, String fossil, 
 			String type, long id){
-		/*
-		 * Create new info group with a title and add it to the list of 
-		 * groups
-		 */
 		IndicoRegistrantInfoGroup group = new IndicoRegistrantInfoGroup();
 		group.setTitle(title);
 		group.setFossil(fossil);
@@ -85,36 +119,56 @@ public class IndicoRegistrantFullInformation {
 		return group;
 	}
 
+	/**
+	 * Create a new social event with only id as information and add it to 
+	 * the list of social events
+	 * 
+	 * @param id
+	 * @return a social event  with only a given ID
+	 */
 	public IndicoRegistrantSocialEvent createSocialEvent(int id){
-		/*
-		 * Create a new social event with only id as information and add it to 
-		 * the list of social events
-		 */
 		IndicoRegistrantSocialEvent event = new IndicoRegistrantSocialEvent();
 		event.setId(id);
 		AddSocialEvent(event);
 		return event;
 	}
 	
+	/**
+	 * Create a new social event with all informations and add it to the list 
+	 * of social events
+	 *
+	 * @param type
+	 * @param fossil
+	 * @param id
+	 * @param price
+	 * @param numberPlaces
+	 * @param currency
+	 * @param caption
+	 * @return the new social event
+	 */
 	public IndicoRegistrantSocialEvent createSocialEvent(String type, String fossil, 
 			int id, double price, long numberPlaces, String currency, String caption){
-		/*
-		 * Create a new social event with all informations and add it to the list 
-		 * of social events
-		 */
 		IndicoRegistrantSocialEvent event = new IndicoRegistrantSocialEvent(type,fossil,id,price,numberPlaces,currency,caption);
 		AddSocialEvent(event);
 		return event;
 	}
 	
+	/**
+	 * Get a list of info groups
+	 * 
+	 * @return the list of info groups
+	 */
 	public List<IndicoRegistrantInfoGroup> getListOfGroups(){
 		return miscallaneousGroups;
 	}
 	
+	/**
+	 * Try to find info group according to the title
+	 * 
+	 * @param title: Group title
+	 * @return the group object (null if not found)
+	 */
 	public IndicoRegistrantInfoGroup findGroupByTitle(String title){
-		/*
-		 * Try to find info group according to the title
-		 */
 		Iterator<IndicoRegistrantInfoGroup> groupIter = miscallaneousGroups.iterator();
 		IndicoRegistrantInfoGroup result = null;
 		while(groupIter.hasNext()){
@@ -127,15 +181,22 @@ public class IndicoRegistrantFullInformation {
 		return result;
 	}
 	
+	/**
+	 * Get a list of social events
+	 * 
+	 * @return List of social events
+	 */
 	public List<IndicoRegistrantSocialEvent> getSocialEvents(){
 		return socialEvents;
 	}
 	
+	/**
+	 * Find the social event by the event id
+	 * 
+	 * @param id: the event ID 
+	 * @return a social event object (null if not found)
+	 */
 	public IndicoRegistrantSocialEvent findSocialEventById(int id){
-		/*
-		 * Find the social event by the event id
-		 * returns the event, or null if not found
-		 */
 		IndicoRegistrantSocialEvent event = null;
 		Iterator<IndicoRegistrantSocialEvent> eventIter = socialEvents.iterator();
 		while(eventIter.hasNext()){
@@ -255,10 +316,12 @@ public class IndicoRegistrantFullInformation {
 		this.complete = complete;
 	}
 	
+	/**
+	 * Calculate the full price of the registrant
+	 * 
+	 * @return the full price
+	 */
 	public double getFullPrice(){
-		/*
-		 * Calculate the full price of the registrant
-		 */
 		double fullPrice = 0.;
 		Iterator<IndicoRegistrantInfoGroup> groupIter = miscallaneousGroups.iterator();
 		while(groupIter.hasNext()){

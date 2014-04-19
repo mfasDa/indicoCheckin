@@ -1,3 +1,19 @@
+/****************************************************************************
+ *  Copyright (C) 2014  Markus Fasel <markus.fasel@cern.ch>                 *
+ *                                                                          * 
+ *  This program is free software: you can redistribute it and/or modify    *
+ *  it under the terms of the GNU General Public License as published by    *
+ *  the Free Software Foundation, either version 3 of the License, or       *
+ *  (at your option) any later version.                                     *
+ *                                                                          *
+ *  This program is distributed in the hope that it will be useful,         *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of          *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the           *
+ *  GNU General Public License for more details.                            *
+ *                                                                          *
+ *  You should have received a copy of the GNU General Public License       *
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
+ ****************************************************************************/
 package indico.checkin.core.api;
 
 import java.io.BufferedReader;
@@ -10,8 +26,21 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+/**
+ * Server catching the answer from indico for a request token 
+ * Class is running in a thread, providing a verification string to the 
+ * application when the thread is done.
+ * 
+ * @author Markus Fasel
+ *
+ */
 public class OAuthVerifyCatcher implements Runnable{
 
+	/**
+	 * Helper class for key/value representation of get parameters
+	 * 
+	 * @author Markus Fasel
+	 */
 	private class Pair{
 		String first;
 		String second;
@@ -81,8 +110,15 @@ public class OAuthVerifyCatcher implements Runnable{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		isTerminate=true;	}
+		isTerminate=true;	
+	}
 	
+	/**
+	 * Converts a string of get parameters into a map
+	 * 
+	 * @param line: string containing get parameters
+	 * @return Map with get parameters in key-value representation
+	 */
 	private Map<String,String> ExtractGetParamters(String line){
 		Map<String,String> result = new HashMap<String,String>();
 		StringTokenizer toks = new StringTokenizer(line, " ");
@@ -108,6 +144,12 @@ public class OAuthVerifyCatcher implements Runnable{
 		return result;
 	}
 	
+	/**
+	 * Decode parameters into key/value pair
+	 * 
+	 * @param paramstring: string-representation of the key/value pair
+	 * @return key/value pair of the get param
+	 */
 	private Pair DecodeParam(String paramstring){
 		int delim = paramstring.indexOf("=");
 		Pair result = new Pair(paramstring.substring(0, delim),paramstring.substring(delim+1));

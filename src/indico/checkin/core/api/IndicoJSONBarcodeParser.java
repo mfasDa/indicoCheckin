@@ -1,3 +1,19 @@
+/****************************************************************************
+ *  Copyright (C) 2014  Markus Fasel <markus.fasel@cern.ch>                 *
+ *                                                                          * 
+ *  This program is free software: you can redistribute it and/or modify    *
+ *  it under the terms of the GNU General Public License as published by    *
+ *  the Free Software Foundation, either version 3 of the License, or       *
+ *  (at your option) any later version.                                     *
+ *                                                                          *
+ *  This program is distributed in the hope that it will be useful,         *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of          *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the           *
+ *  GNU General Public License for more details.                            *
+ *                                                                          *
+ *  You should have received a copy of the GNU General Public License       *
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
+ ****************************************************************************/
 package indico.checkin.core.api;
 
 import indico.checkin.core.data.IndicoParsedETicket;
@@ -12,22 +28,25 @@ import org.json.simple.parser.ContainerFactory;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-
+/**
+ * Class parsing the JSon result from the barcode scan
+ * 
+ * Class depending on additional library:
+ *   json-simple, published under Apache License v2 (attached to the package)
+ *   
+ * @author Markus Fasel
+ *
+ */
 public class IndicoJSONBarcodeParser {
-	/**
-	 * Class parsing the JSon result from the barcode scan
-	 * License: GPLv3 (a copy of the license is provided with the package)
-	 * 
-	 * Class depending on additional library:
-	 *   json-simple, published under Apache License v2 (attached to the package)
-	 * 
-	 * @author: Markus Fasel
-	 */
 
+	/**
+	 * Parsing JSON type barcode
+	 * 
+	 * @param regjson: JSON string representing the barcode
+	 * @return the parsed E-Ticket
+	 * @throws ETicketDecodingException
+	 */
 	public IndicoParsedETicket parse(String regjson) throws ETicketDecodingException{
-		/*
-		 * Parsing JSON type barcode
-		 */
 		IndicoParsedETicket reg = null;
 		if(!regjson.isEmpty()){
 			// string not empty - start parsing

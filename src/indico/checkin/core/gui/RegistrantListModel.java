@@ -1,3 +1,19 @@
+/****************************************************************************
+ *  Copyright (C) 2014  Markus Fasel <markus.fasel@cern.ch>                 *
+ *                                                                          * 
+ *  This program is free software: you can redistribute it and/or modify    *
+ *  it under the terms of the GNU General Public License as published by    *
+ *  the Free Software Foundation, either version 3 of the License, or       *
+ *  (at your option) any later version.                                     *
+ *                                                                          *
+ *  This program is distributed in the hope that it will be useful,         *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of          *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the           *
+ *  GNU General Public License for more details.                            *
+ *                                                                          *
+ *  You should have received a copy of the GNU General Public License       *
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
+ ****************************************************************************/
 package indico.checkin.core.gui;
 
 import java.util.ArrayList;
@@ -10,15 +26,20 @@ import indico.checkin.core.data.IndicoRegistrant;
 
 import javax.swing.table.AbstractTableModel;
 
+/**
+ * Model for table used in the manual search dialog
+ * License: GPLv3 (a copy of the license is provided with the package)
+ * 
+ * @author Markus Fasel
+ */
 public class RegistrantListModel extends AbstractTableModel {
-	
 	/**
-	 * Model for table used in the manual search dialog
-	 * License: GPLv3 (a copy of the license is provided with the package)
+	 * Helper class storing the entries in alphabetical order according to
+	 * the second name
 	 * 
 	 * @author Markus Fasel
+	 *
 	 */
-	
 	private class entry implements Comparable<entry>{
 		private String lastname;
 		private String firstname;
@@ -230,7 +251,7 @@ public class RegistrantListModel extends AbstractTableModel {
 		/*
 		 * Get the matching registrant for a given row
 		 */
-		return data.getRegistrantById(entrylist.get(row).getId());
+		return data.FindRegistrantById(entrylist.get(row).getId());
 	}
 	
 	public IndicoRegistrant getSelectedRegistrantForRow(int row) throws EntryListBoundaryException{
@@ -239,7 +260,7 @@ public class RegistrantListModel extends AbstractTableModel {
 		 * for a given row
 		 */
 		IndicoRegistrant reg = null;
-		reg = data.getRegistrantById(getSelectedEntryAt(row).getId());
+		reg = data.FindRegistrantById(getSelectedEntryAt(row).getId());
 		return reg;
 	}
 }
