@@ -1,6 +1,23 @@
+/****************************************************************************
+ *  Copyright (C) 2014  Markus Fasel <markus.fasel@cern.ch>                 *
+ *                                                                          * 
+ *  This program is free software: you can redistribute it and/or modify    *
+ *  it under the terms of the GNU General Public License as published by    *
+ *  the Free Software Foundation, either version 3 of the License, or       *
+ *  (at your option) any later version.                                     *
+ *                                                                          *
+ *  This program is distributed in the hope that it will be useful,         *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of          *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the           *
+ *  GNU General Public License for more details.                            *
+ *                                                                          *
+ *  You should have received a copy of the GNU General Public License       *
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
+ ****************************************************************************/
 package indico.checkin.core.gui;
 
 import indico.checkin.core.data.IndicoLoginData;
+import indico.checkin.core.api.IndicoKeyAuthLayer;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
@@ -16,18 +33,16 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+/**
+ * GUI of the login dialog. Registrants enter the server url,
+ * the conference ID and the api key and secret. The information
+ * is passed to the mother window which establishes a connection
+ * and fetches the full dataset.
+ * 
+ * @author Markus Fasel
+ *
+ */
 public class IndicoAPILoginDialog extends JDialog{
-
-	/**
-	 * GUI of the login dialog. Registrants enter the server url,
-	 * the conference ID and the api key and secret. The information
-	 * is passed to the mother window which establishes a connection
-	 * and fetches the full dataset.
-	 * 
-	 * License: GPLv3 (a copy of the license is provided with the package)
-	 *  
-	 * @author Markus Fasel
-	 */
 	private static final long serialVersionUID = 1L;
 	
 	private JTextField tfserver;
@@ -137,7 +152,7 @@ public class IndicoAPILoginDialog extends JDialog{
 				// Return to parent
 				parentFrame.setEnabled(true);
 				if(infoset){
-					parentFrame.processLoginReturn(new IndicoLoginData(tfserver.getText(), Integer.parseInt(tfevent.getText()), tfapikey.getText(), tfapisecret.getText()));
+					parentFrame.processLoginReturn(new IndicoLoginData(tfserver.getText(), Integer.parseInt(tfevent.getText()), new IndicoKeyAuthLayer(tfapikey.getText(), tfapisecret.getText())));
 				}
 			}
 			

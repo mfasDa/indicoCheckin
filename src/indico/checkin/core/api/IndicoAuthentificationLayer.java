@@ -14,49 +14,34 @@
  *  You should have received a copy of the GNU General Public License       *
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ****************************************************************************/
-package indico.checkin.core.data;
+package indico.checkin.core.api;
 
-import indico.checkin.core.api.IndicoAuthentificationLayer;
+import java.util.Map;
 
-public class IndicoLoginData {
-	private String server;
-	private int event;
-	private IndicoAuthentificationLayer authentifier;
+/**
+ * Interface defining methods for accessing the Indico api via the HTTP. Methods
+ * for GET and POST request are implemented
+ * 
+ * @author Markus Fasel <markus.fasel@cern.ch>
+ *
+ */
+public interface IndicoAuthentificationLayer {
 	
-	public IndicoLoginData(){
-		this.server = "";
-		this.event = -1;
-		this.setAuthentifier(null);
-	}
+	/**
+	 * Definition for get access to the indico api
+	 * @param geturl: URL for the get request
+	 * @param params: Additional get params
+	 * @return Answer from the server
+	 * @throws IndicoAuthException
+	 */
+	public String doGetRequest(String geturl, Map<String, String> params) throws IndicoAuthException;
 	
-	public IndicoLoginData(String server, int event, IndicoAuthentificationLayer authentifier){
-		this.server = server;
-		this.event = event;
-		this.authentifier = authentifier;
-	}
-
-	public String getServer() {
-		return server;
-	}
-
-	public void setServer(String server) {
-		this.server = server;
-	}
-
-	public int getEvent() {
-		return event;
-	}
-
-	public void setEvent(int event) {
-		this.event = event;
-	}
-
-	public IndicoAuthentificationLayer getAuthentifier() {
-		return authentifier;
-	}
-
-	public void setAuthentifier(IndicoAuthentificationLayer authentifier) {
-		this.authentifier = authentifier;
-	}
-
+	/**
+	 * Definition for get access to the indico api
+	 * @param geturl
+	 * @param params
+	 * @return
+	 * @throws IndicoAuthException
+	 */
+	public String doPostRequest(String geturl, Map<String, String> params) throws IndicoAuthException;
 }

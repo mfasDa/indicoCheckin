@@ -1,3 +1,19 @@
+/****************************************************************************
+ *  Copyright (C) 2014  Markus Fasel <markus.fasel@cern.ch>                 *
+ *                                                                          * 
+ *  This program is free software: you can redistribute it and/or modify    *
+ *  it under the terms of the GNU General Public License as published by    *
+ *  the Free Software Foundation, either version 3 of the License, or       *
+ *  (at your option) any later version.                                     *
+ *                                                                          *
+ *  This program is distributed in the hope that it will be useful,         *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of          *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the           *
+ *  GNU General Public License for more details.                            *
+ *                                                                          *
+ *  You should have received a copy of the GNU General Public License       *
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
+ ****************************************************************************/
 package indico.checkin.core.gui;
 
 import java.awt.BorderLayout;
@@ -24,13 +40,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
+/**
+ * Class respresenting the main window of the checkin app GUI
+ * @author Markus Fasel
+ *
+ */
 public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, WindowListener {
-	/**
-	 * Class respresenting the main window of the checkin app GUI
-	 * License: GPLv3 (a copy of the license is provided with the package)
-	 * 
-	 * @author: Markus Fasel
-	 */
 	private static final long serialVersionUID = 1L;
 	private JButton loginbutton;
 	private JButton apiinfobutton;
@@ -57,8 +72,10 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 	// connection to indico server
 	private IndicoAPIConnector indicoConnection;
 	
+	/**
+	 * Default constructor: Create the gui and show it
+	 */
 	public IndicoCheckinAppMainGui(){
-		// Default constructor
 		
 		try {
 			// Set the look and feel to the system look and feel
@@ -77,11 +94,10 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		isLoggedIn = false;
 	}
 
-	
+	/**
+	 * Create main window
+	 */
 	protected void initWindow(){
-		/*
-		 * Create main window
-		 */
 		this.setTitle("Indico checkin");
 		this.setLayout(new BorderLayout());
 		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -200,26 +216,25 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		this.setVisible(true);
 	}
 	
-	
+	/**
+	 * Enable button generating a ticket
+	 */
 	public void EnableTicketButton(){
-		/*
-		 * Enable button generating a ticket
-		 */
 		 generateTicketButton.setEnabled(true);
 	}
 	
+	/**
+	 * Enable button generating a ticket
+	 */
 	public void DisableTicketButton(){
-		/*
-		 * Enable button generating a ticket
-		 */
 		generateTicketButton.setEnabled(false);
 	}
 
+	/**
+	 * Handle click to the different buttons
+	 */
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
-		/*
-		 * Handle click to the different buttons
-		 */
 		if(arg0.getActionCommand().equals("login")){
 			handleLogin();
 		} else if(arg0.getActionCommand().equals("apiinfo")){
@@ -279,10 +294,10 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		
 	}
 	
+	/**
+	 * show exit dialog
+	 */
 	private void handleExit(){
-		/*
-		 * show exit dialog
-		 */
 		if(newregthread != null){
 			// Shut down new registrant thread before exiting the program
 			newregthread.interrupt();
@@ -291,25 +306,26 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 			this.dispose();
 	}
 	
+	/**
+	 * Show login dialog
+	 * Login dialog will return to function processLoginReturn
+	 */
 	private void handleLogin(){
-		/*
-		 * Show login dialog
-		 * Login dialog will return to function processLoginReturn
-		 */
 		IndicoAPILoginDialog loginDialog = new IndicoAPILoginDialog(this);
 		loginDialog.setVisible(true);
 	}
 	
+	/**
+	 * return function for the login dialog: 
+	 * - Connects to server and fetches registrant list
+	 * - In case the registrant list was transferred successfully,
+	 *   enable button for user processing
+	 * - Inform the user with message dialog about the result of the transfer
+	 * 
+	 * @param data: Login information
+	 */
 	public void processLoginReturn(IndicoLoginData data){
-		/*
-		 * return function for the login dialog: 
-		 * - Connects to server and fetches registrant list
-		 * - In case the registrant list was transferred successfully,
-		 *   enable button for user processing
-		 * - Inform the user with message dialog about the result of the transfer
-		 */
-		this.indicoConnection.setApikey(data.getApikey());
-		this.indicoConnection.setApisecret(data.getApisecret());
+		this.indicoConnection.setAuthentifier(data.getAuthentifier());
 		this.indicoConnection.setServer(data.getServer());
 		this.indicoConnection.setEventID(data.getEvent());
 		boolean success = false;
@@ -347,22 +363,21 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 
 	}
 	
+	/**
+	 * Show Dialog with API connection details
+	 */
 	private void showApiInfoDialog(){
-		/*
-		 * Show Dialog with API connection details
-		 */
 		IndicoAPIInfoDialog infoDialog = new IndicoAPIInfoDialog(this, 
-				this.indicoConnection.getApikey(), 
-				this.indicoConnection.getApisecret(),
 				this.indicoConnection.getServer(),
-				this.indicoConnection.getEventID());
+				this.indicoConnection.getEventID(),
+				this.indicoConnection.getAuthentifier());
 		infoDialog.setVisible(true);
 	}
 	
+	/**
+	 * Handle click to newUserButton
+	 */
 	public void newUserClicked(){
-		/*
-		 * Handle click to newUserButton
-		 */
 		this.newUserButton.setEnabled(false);
 		this.changePaymentButton.setEnabled(false);
 		this.checkinButton.setEnabled(false);
@@ -373,12 +388,12 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		newregthread.start();
 	}
 	
+	/**
+	 * Registrant has paid at the conference desk:
+	 * Enable buttons for checkin and ticket generation
+	 * Put information to indico
+	 */
 	public void changePaymentClicked(){
-		/*
-		 * Registrant has paid at the conference desk:
-		 * Enable buttons for checkin and ticket generation
-		 * Put information to indico
-		 */
 		boolean success = false;
 		try {
 			success = this.indicoConnection.pushPayment(current);
@@ -399,13 +414,13 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		 * Handle click to printTicket button
 		 */
 	}
-	
+
+	/**
+	 * Open dialog with a list of all registrants where the user can search
+	 * a given registrant by the name. In case a registrant is selected, the same
+	 * procedure as for e-tickets is applied
+	 */
 	public void handleManualSearch(){
-		/*
-		 * Open dialog with a list of all registrants where the user can search
-		 * a given registrant by the name. In case a registrant is selected, the same
-		 * procedure as for e-tickets is applied
-		 */
 		ManualSearchDialog searchDialog = new ManualSearchDialog(this, manualSearchModel);
 		searchDialog.setVisible(true);
 		if(searchDialog.isEntrySelected()){
@@ -440,12 +455,12 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		}
 	}
 	
+	/**
+	 * Registrant checked in: 
+	 * Post checkin status to indico, update registrant and registrant display, 
+	 * and disable checkin button 
+	 */
 	public void handleCheckinButton(){
-		/*
-		 * Registrant checked in: 
-		 * Post checkin status to indico, update registrant and registrant display, 
-		 * and disable checkin button 
-		 */
 		if(current != null){
 			try {
 				boolean status = indicoConnection.pushCheckin(current);
@@ -461,11 +476,11 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 			}
 		}
 	}
-	
+
+	/**
+	 * Ticket was parsed
+	 */
 	public void handleEticketParsed(){
-		/*
-		 * Ticket was parsed
-		 */
 		if(registrants.isTicketValid(eticket)){
 			// check ticket validity
 			current = registrants.FindRegistrant(eticket);
@@ -501,14 +516,12 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 			JOptionPane.showMessageDialog(this, "Invalid ETicket");
 		}
 	}
-		
+
+	/**
+	 * User pressed cancel:
+	 * Finish registrant thread, deactivate user buttons, and remove link for current user
+	 */
 	public void handleCancel(){
-		/*
-		 * User pressed cancel:
-		 * 
-		 * Finish registrant thread, deactivate user buttons, and remove link for current user
-		 * 
-		 */
 		this.current = null;
 		
 		this.generateTicketButton.setEnabled(false);
@@ -518,10 +531,10 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		finishBarcodeThread();
 	}
 
+	/**
+	 * enable new user button
+	 */
 	public void finishBarcodeThread(){
-		/*
-		 * enable new user button
-		 */
 		if(isLoggedIn) this.newUserButton.setEnabled(true);
 		if(newregthread != null){
 			newregthread.interrupt();

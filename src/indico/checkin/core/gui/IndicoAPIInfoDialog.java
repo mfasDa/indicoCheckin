@@ -1,4 +1,23 @@
+/****************************************************************************
+ *  Copyright (C) 2014  Markus Fasel <markus.fasel@cern.ch>                 *
+ *                                                                          * 
+ *  This program is free software: you can redistribute it and/or modify    *
+ *  it under the terms of the GNU General Public License as published by    *
+ *  the Free Software Foundation, either version 3 of the License, or       *
+ *  (at your option) any later version.                                     *
+ *                                                                          *
+ *  This program is distributed in the hope that it will be useful,         *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of          *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the           *
+ *  GNU General Public License for more details.                            *
+ *                                                                          *
+ *  You should have received a copy of the GNU General Public License       *
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
+ ****************************************************************************/
 package indico.checkin.core.gui;
+
+import indico.checkin.core.api.IndicoAuthentificationLayer;
+import indico.checkin.core.api.IndicoKeyAuthLayer;
 
 import java.awt.BorderLayout;
 import java.awt.Frame;
@@ -25,13 +44,20 @@ public class IndicoAPIInfoDialog extends JDialog{
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	public IndicoAPIInfoDialog(Frame owner, String apikey, String apisecret, String server, int event){
+	public IndicoAPIInfoDialog(Frame owner, String server, int event, IndicoAuthentificationLayer authentifier){
 		super(owner);
 				
 		JPanel pnlinfo = new JPanel(new GridBagLayout());
 		GridBagConstraints cs = new GridBagConstraints();
 		cs.fill = GridBagConstraints.HORIZONTAL;
-
+		
+		String apikey = "";
+		String apisecret = "";
+		if(authentifier instanceof IndicoKeyAuthLayer){
+			IndicoKeyAuthLayer layer = (IndicoKeyAuthLayer) authentifier;
+			apikey = layer.getApikey();
+			apisecret = layer.getApisecret();
+		}
 		cs.gridx = 0;
 		cs.gridy = 0;
 		cs.gridwidth = 1;
@@ -72,6 +98,7 @@ public class IndicoAPIInfoDialog extends JDialog{
 		cs.gridwidth = 2;
 		cs.insets = new Insets(3,3,3,10);
 		pnlinfo.add(getAdjustedLabel(apisecret), cs);
+
 		
 		JButton btnOK = new JButton("OK");
 		btnOK.addActionListener(new ActionListener(){
