@@ -1,5 +1,6 @@
 /****************************************************************************
  *  Copyright (C) 2014  Markus Fasel <markus.fasel@cern.ch>                 *
+ *                      Steffen Weber <s.weber@gsi.de>                      *
  *                                                                          * 
  *  This program is free software: you can redistribute it and/or modify    *
  *  it under the terms of the GNU General Public License as published by    *
@@ -44,6 +45,7 @@ import javax.swing.UIManager;
 /**
  * Class respresenting the main window of the checkin app GUI
  * @author Markus Fasel
+ * @author Steffen Weber
  *
  */
 public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, WindowListener {
