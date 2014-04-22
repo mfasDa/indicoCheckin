@@ -86,6 +86,8 @@ public class PdfExporter {
 			 stamper.getAcroFields().setField("ID", String.valueOf(registrant.getID()) );
 			 stamper.close();
 			 reader.close();
+			 System.out.println("pdf created");
+			 
 		 } catch (Exception e) {
 		      e.printStackTrace();
 		 }
