@@ -17,24 +17,18 @@
 package indico.checkin.core.api;
 
 /**
- *  Absorbs all possible exception in the indico API connection
- *  and forwards a message string to classes using the transfer
- *  (i.e. GUI)
+ * Exception class for authentification problems
  * 
- *  @author: Markus Fasel
+ * @author: Markus Fasel
  */
-public class RegistrantBuilderException extends Exception {
-
+public class IndicoAuthException extends Exception {
 
 	private static final long serialVersionUID = 1L;
+	
 	private String message;
 
-	public RegistrantBuilderException(){
-		message = "";
-	}
-	
-	public RegistrantBuilderException(String msg){
-		message = msg;
+	IndicoAuthException(String message){
+		this.message = message;
 	}
 	
 	@Override

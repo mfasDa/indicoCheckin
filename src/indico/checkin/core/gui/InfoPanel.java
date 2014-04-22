@@ -1,3 +1,19 @@
+/****************************************************************************
+ *  Copyright (C) 2014  Markus Fasel <markus.fasel@cern.ch>                 *
+ *                                                                          * 
+ *  This program is free software: you can redistribute it and/or modify    *
+ *  it under the terms of the GNU General Public License as published by    *
+ *  the Free Software Foundation, either version 3 of the License, or       *
+ *  (at your option) any later version.                                     *
+ *                                                                          *
+ *  This program is distributed in the hope that it will be useful,         *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of          *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the           *
+ *  GNU General Public License for more details.                            *
+ *                                                                          *
+ *  You should have received a copy of the GNU General Public License       *
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
+ ****************************************************************************/
 package indico.checkin.core.gui;
 
 import indico.checkin.core.data.IndicoRegistrant;
@@ -12,22 +28,21 @@ import javax.swing.event.ListSelectionListener;
 
 import com.github.sarxos.webcam.Webcam;
 
+/**
+ * Class for user info panel in the main window. The panel contains two
+ * parts:
+ * - a webcam window where the current webcam picture is shown, so that the 
+ *   user can put the ticket in a way that the barcode can be easily read in
+ * - a table showing the registrant details. This table is updated when the
+ *   a new registrant is processed.
+ * 
+ * Class dependent on additional libraries:
+ *   webcam-capture (license attached to the package)
+ *  
+ * @author Markus Fasel
+ */
 public class InfoPanel extends JPanel implements ListSelectionListener{
 	
-	/**
-	 * Class for user info panel in the main window. The panel contains two
-	 * parts:
-	 * - a webcam window where the current webcam picture is shown, so that the 
-	 *   user can put the ticket in a way that the barcode can be easily read in
-	 * - a table showing the registrant details. This table is updated when the
-	 *   a new registrant is processed.
-	 * License: GPLv3 (a copy of the license is provided with the package)
-	 * 
-	 * Class dependent on additional libraries:
-	 *   webcam-capture (license attached to the package)
-	 *  
-	 * @author Markus Fasel
-	 */
 	private static final long serialVersionUID = 1L;
 	WebcamImagePanel webcampanel;
 	JTable userdata;

@@ -1,23 +1,38 @@
+/****************************************************************************
+ *  Copyright (C) 2014  Markus Fasel <markus.fasel@cern.ch>                 *
+ *                                                                          * 
+ *  This program is free software: you can redistribute it and/or modify    *
+ *  it under the terms of the GNU General Public License as published by    *
+ *  the Free Software Foundation, either version 3 of the License, or       *
+ *  (at your option) any later version.                                     *
+ *                                                                          *
+ *  This program is distributed in the hope that it will be useful,         *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of          *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the           *
+ *  GNU General Public License for more details.                            *
+ *                                                                          *
+ *  You should have received a copy of the GNU General Public License       *
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
+ ****************************************************************************/
 package indico.checkin.core.data;
+
+import indico.checkin.core.api.IndicoAuthentificationLayer;
 
 public class IndicoLoginData {
 	private String server;
 	private int event;
-	private String apikey;
-	private String apisecret;
+	private IndicoAuthentificationLayer authentifier;
 	
 	public IndicoLoginData(){
 		this.server = "";
 		this.event = -1;
-		this.apikey = "";
-		this.apisecret = "";
+		this.setAuthentifier(null);
 	}
 	
-	public IndicoLoginData(String server, int event, String apikey, String apisecret){
+	public IndicoLoginData(String server, int event, IndicoAuthentificationLayer authentifier){
 		this.server = server;
 		this.event = event;
-		this.apikey = apikey;
-		this.apisecret = apisecret;
+		this.authentifier = authentifier;
 	}
 
 	public String getServer() {
@@ -36,20 +51,12 @@ public class IndicoLoginData {
 		this.event = event;
 	}
 
-	public String getApikey() {
-		return apikey;
+	public IndicoAuthentificationLayer getAuthentifier() {
+		return authentifier;
 	}
 
-	public void setApikey(String apikey) {
-		this.apikey = apikey;
-	}
-
-	public String getApisecret() {
-		return apisecret;
-	}
-
-	public void setApisecret(String apisecret) {
-		this.apisecret = apisecret;
+	public void setAuthentifier(IndicoAuthentificationLayer authentifier) {
+		this.authentifier = authentifier;
 	}
 
 }

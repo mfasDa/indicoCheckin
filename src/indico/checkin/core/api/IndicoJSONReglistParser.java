@@ -1,3 +1,19 @@
+/****************************************************************************
+ *  Copyright (C) 2014  Markus Fasel <markus.fasel@cern.ch>                 *
+ *                                                                          * 
+ *  This program is free software: you can redistribute it and/or modify    *
+ *  it under the terms of the GNU General Public License as published by    *
+ *  the Free Software Foundation, either version 3 of the License, or       *
+ *  (at your option) any later version.                                     *
+ *                                                                          *
+ *  This program is distributed in the hope that it will be useful,         *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of          *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the           *
+ *  GNU General Public License for more details.                            *
+ *                                                                          *
+ *  You should have received a copy of the GNU General Public License       *
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
+ ****************************************************************************/
 package indico.checkin.core.api;
 
 import indico.checkin.core.data.IndicoEventRegistrantList;
@@ -11,22 +27,24 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+/**
+ * Parser class for the registrant list obtained as JSON string from the 
+ * indico server. Converts registrant list in the program data structure.
+ * 
+ * Clas depending on additional library:
+ *   json-simple, published under Apache License 2.0 (attached to the package)
+ *
+ * @author Markus Fasel
+ *
+ */
 public class IndicoJSONReglistParser {
 	/**
-	 * Parser class for the registrant list obtained as JSON string from the 
-	 * indico server. Converts registrant list in the program data structure.
-	 * License: GPLv3 (a copy of the license is provided with the package)
+	 * Parse JSON string representation of the registrant list
 	 * 
-	 * Clas depending on additional library:
-	 *   json-simple, published under Apache License 2.0 (attached to the package)
-	 * 
-	 * @author: Markus Fasel
+	 * @param str: JSON representation of the reglist
+	 * @return The registrant list
 	 */
-	
 	public IndicoEventRegistrantList parseJSONRegistrantList(String str){
-		/*
-		 * Parse JSON string representation of the registrant list
-		 */
 		IndicoEventRegistrantList res = null;
 		
 		JSONParser parser = new JSONParser();
@@ -59,7 +77,12 @@ public class IndicoJSONReglistParser {
 		return res;
 	}
 
-
+	/**
+	 * Convert JSON registrant information into a registrant object
+	 * 
+	 * @param jsonreg: JSON object of a registrant
+	 * @return The registrant (with basic information only)
+	 */
 	public IndicoRegistrant parseRegistrant(JSONObject jsonreg){
 		IndicoRegistrant reg = new IndicoRegistrant();
 		Iterator<?> keyIter = jsonreg.entrySet().iterator();
@@ -88,10 +111,13 @@ public class IndicoJSONReglistParser {
 		return reg;
 	}
 	
+	/**
+	 * Parse json string and add values to the registrant
+	 * 
+	 * @param reg: the registrant
+	 * @param jsonstring: json representation of the information
+	 */
 	public void parseFullRegistrantInformation(IndicoRegistrant reg, String jsonstring){
-		/*
-		 * Parse json string and add values to the registrant
-		 */
 		JSONParser parser = new JSONParser();
 		try {
 			JSONObject regfull = (JSONObject)parser.parse(jsonstring);

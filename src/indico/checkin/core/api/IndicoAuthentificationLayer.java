@@ -16,29 +16,32 @@
  ****************************************************************************/
 package indico.checkin.core.api;
 
+import java.util.Map;
+
 /**
- *  Absorbs all possible exception in the indico API connection
- *  and forwards a message string to classes using the transfer
- *  (i.e. GUI)
+ * Interface defining methods for accessing the Indico api via the HTTP. Methods
+ * for GET and POST request are implemented
  * 
- *  @author: Markus Fasel
+ * @author Markus Fasel <markus.fasel@cern.ch>
+ *
  */
-public class RegistrantBuilderException extends Exception {
-
-
-	private static final long serialVersionUID = 1L;
-	private String message;
-
-	public RegistrantBuilderException(){
-		message = "";
-	}
+public interface IndicoAuthentificationLayer {
 	
-	public RegistrantBuilderException(String msg){
-		message = msg;
-	}
+	/**
+	 * Definition for get access to the indico api
+	 * @param geturl: URL for the get request
+	 * @param params: Additional get params
+	 * @return Answer from the server
+	 * @throws IndicoAuthException
+	 */
+	public String doGetRequest(String geturl, Map<String, String> params) throws IndicoAuthException;
 	
-	@Override
-	public String getMessage(){
-		return message;
-	}
+	/**
+	 * Definition for get access to the indico api
+	 * @param geturl
+	 * @param params
+	 * @return
+	 * @throws IndicoAuthException
+	 */
+	public String doPostRequest(String geturl, Map<String, String> params) throws IndicoAuthException;
 }

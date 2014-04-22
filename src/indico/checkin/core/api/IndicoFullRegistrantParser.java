@@ -1,3 +1,19 @@
+/****************************************************************************
+ *  Copyright (C) 2014  Markus Fasel <markus.fasel@cern.ch>                 *
+ *                                                                          * 
+ *  This program is free software: you can redistribute it and/or modify    *
+ *  it under the terms of the GNU General Public License as published by    *
+ *  the Free Software Foundation, either version 3 of the License, or       *
+ *  (at your option) any later version.                                     *
+ *                                                                          *
+ *  This program is distributed in the hope that it will be useful,         *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of          *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the           *
+ *  GNU General Public License for more details.                            *
+ *                                                                          *
+ *  You should have received a copy of the GNU General Public License       *
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
+ ****************************************************************************/
 package indico.checkin.core.api;
 
 import indico.checkin.core.data.IndicoRegistrantFullInformation;
@@ -12,22 +28,24 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-
+/**
+ * Parser for JSON based indico registrant full information
+ * 
+ * Class depending on additional library
+ *   json-simple, published under Apache License 2.0
+ * 
+ * @author: Markus Fasel
+ */
 public class IndicoFullRegistrantParser {
-	/**
-	 * Parser for JSON based indico registrant full information
-	 * License: GPLv3 (a copy of the license is provided with the package)
-	 * 
-	 * Class depending on additional library
-	 *   json-simple, published under Apache License 2.0
-	 * 
-	 * @author: Markus Fasel
-	 */
 	
+	/**
+	 * Parse json result and convert to registrant full information
+	 * 
+	 * @param jsonstring: Input string from the server
+	 * @return The registrant full information
+	 * @throws ParseException
+	 */
 	public IndicoRegistrantFullInformation parseRegistrant(String jsonstring) throws ParseException {
-		/*
-		 * Parse json result and convert to registrant full information
-		 */
 		IndicoRegistrantFullInformation registrant = null;
 		JSONParser parser = new JSONParser();
 		JSONObject parsedRegistrant = (JSONObject)parser.parse(jsonstring);
@@ -47,18 +65,20 @@ public class IndicoFullRegistrantParser {
 		}
 		return registrant;
 	}
-	
+
+	/**
+	 * Process map entry
+	 * 
+	 * Unhandled:
+	 * + sessionList
+	 * + accommodation
+	 * 
+	 * Currently unhandled
+	 * 
+	 * @param registrant: The registrant
+	 * @param entry: Entry of the registrant information
+	 */
 	private void handleEntry(IndicoRegistrantFullInformation registrant, Map.Entry<?,?> entry){
-		/*
-		 * Process map entry
-		 * 
-		 * Unhandled:
-		 * + sessionList
-		 * + accommodation
-		 * 
-		 * Currently unhandled
-		 * + checkin_date
-		 */
 		String key = (String)entry.getKey();
 		Object value = entry.getValue();
 		if(key.equals("_type"))
@@ -100,11 +120,14 @@ public class IndicoFullRegistrantParser {
 			}
 		}
 	}
-		
+	
+	/**
+	 * Convert info group
+	 * 
+	 * @param registrant: The current registrant
+	 * @param group: The current info group
+	 */
 	private void handleGroup(IndicoRegistrantFullInformation registrant, JSONObject group){
-		/*
-		 * Convert info group
-		 */
 		try{
 			IndicoRegistrantInfoGroup infogroup = registrant.createInfoGroup((String)group.get("title"), (String)group.get("_fossil"), 
 				(String)group.get("_type"), Long.parseLong(group.get("id").toString()));
@@ -118,10 +141,12 @@ public class IndicoFullRegistrantParser {
 		}
 	}
 	
+	/**
+	 * Convert response item from JSON Object to field object
+	 * @param item: current item to process
+	 * @return info field used in the full registrant information
+	 */
 	private IndicoRegistrantInfoField convertResponseItem(JSONObject item){
-		/*
-		 * Convert response item from JSON Object to field object
-		 */
 		IndicoRegistrantInfoField field = new IndicoRegistrantInfoField();
 		field.setCaption((String)item.get("caption"));
 		field.setType((String)item.get("_type"));

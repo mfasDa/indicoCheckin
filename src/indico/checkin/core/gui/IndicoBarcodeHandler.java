@@ -1,3 +1,19 @@
+/****************************************************************************
+ *  Copyright (C) 2014  Markus Fasel <markus.fasel@cern.ch>                 *
+ *                                                                          * 
+ *  This program is free software: you can redistribute it and/or modify    *
+ *  it under the terms of the GNU General Public License as published by    *
+ *  the Free Software Foundation, either version 3 of the License, or       *
+ *  (at your option) any later version.                                     *
+ *                                                                          *
+ *  This program is distributed in the hope that it will be useful,         *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of          *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the           *
+ *  GNU General Public License for more details.                            *
+ *                                                                          *
+ *  You should have received a copy of the GNU General Public License       *
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
+ ****************************************************************************/
 package indico.checkin.core.gui;
 
 import indico.checkin.core.api.ETicketDecodingException;
@@ -15,20 +31,20 @@ import com.google.zxing.Result;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
 
+/**
+ * Class handling reading of the barcode. The class tries to catch a webcam
+ * picture. Class is deprecated. Barcode handling replaced by a webcam watching thread,
+ * which is much more performant
+ * 
+ * Class dependent on additional libraries:
+ *   webcam-capture (license attached to the package)
+ *   zxing published under Apache License v2 (attached to the package)
+ * 
+ * @author: Markus Fasel
+ * @deprecated
+ */
 public class IndicoBarcodeHandler {
-	
-	/**
-	 * Class handling reading of the barcode. The class tries to catch a webcam
-	 * picture
-	 * License: GPLv3 (a copy of the license is provided with the package)
-	 * 
-	 * Class dependent on additional libraries:
-	 *   webcam-capture (license attached to the package)
-	 *   zxing published under Apache License v2 (attached to the package)
-	 * 
-	 * @author: Markus Fasel
-	 */
-	
+		
 	String barcode;
 	
 	public IndicoBarcodeHandler(){

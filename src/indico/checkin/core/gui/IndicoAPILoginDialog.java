@@ -1,6 +1,26 @@
+/****************************************************************************
+ *  Copyright (C) 2014  Markus Fasel <markus.fasel@cern.ch>                 *
+ *                                                                          * 
+ *  This program is free software: you can redistribute it and/or modify    *
+ *  it under the terms of the GNU General Public License as published by    *
+ *  the Free Software Foundation, either version 3 of the License, or       *
+ *  (at your option) any later version.                                     *
+ *                                                                          *
+ *  This program is distributed in the hope that it will be useful,         *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of          *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the           *
+ *  GNU General Public License for more details.                            *
+ *                                                                          *
+ *  You should have received a copy of the GNU General Public License       *
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
+ ****************************************************************************/
 package indico.checkin.core.gui;
 
 import indico.checkin.core.data.IndicoLoginData;
+import indico.checkin.core.api.IndicoAuthException;
+import indico.checkin.core.api.IndicoAuthentificationLayer;
+import indico.checkin.core.api.IndicoKeyAuthLayer;
+import indico.checkin.core.api.IndicoOAuthLayer;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
@@ -9,43 +29,43 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+import javax.swing.border.EtchedBorder;
 
+/**
+ * GUI of the login dialog. Registrants enter the server url,
+ * the conference ID and the api key and secret. The information
+ * is passed to the mother window which establishes a connection
+ * and fetches the full dataset.
+ * 
+ * @author Markus Fasel
+ *
+ */
 public class IndicoAPILoginDialog extends JDialog{
-
-	/**
-	 * GUI of the login dialog. Registrants enter the server url,
-	 * the conference ID and the api key and secret. The information
-	 * is passed to the mother window which establishes a connection
-	 * and fetches the full dataset.
-	 * 
-	 * License: GPLv3 (a copy of the license is provided with the package)
-	 *  
-	 * @author Markus Fasel
-	 */
 	private static final long serialVersionUID = 1L;
-	
+		
 	private JTextField tfserver;
 	private JTextField tfevent;
 	private JTextField tfapikey;
 	private JTextField tfapisecret;
-	private JButton btnconfirm;
-	private JButton btncancel;
 	private IndicoCheckinAppMainGui parentFrame;
-	private boolean infoset;
+	private boolean isKeyAuth;
 	
 	public IndicoAPILoginDialog(IndicoCheckinAppMainGui owner){
 		super(owner, "Indico connection login", false);
 		owner.setEnabled(false);
-		this.parentFrame = owner;
-		this.infoset = false;
+		parentFrame = owner;
+		isKeyAuth = false;
 		
-		this.setAutoRequestFocus(true);
+		setAutoRequestFocus(true);
 		
 		JPanel pnlInfo = new JPanel(new GridBagLayout());
 		GridBagConstraints cs = new GridBagConstraints();
@@ -57,13 +77,13 @@ public class IndicoAPILoginDialog extends JDialog{
 		cs.gridwidth = 1;	
 		cs.insets = new Insets(10,10,3,3);
 		pnlInfo.add(new JLabel("Server:"), cs);
-		this.tfserver = new JTextField(20);
+		tfserver = new JTextField(20);
 		tfserver.setEditable(true);
 		cs.gridx = 1;
 		cs.gridy = 0;
 		cs.gridwidth = 2;	// make bag broader
 		cs.insets = new Insets(10,3,3,10);
-		pnlInfo.add(this.tfserver, cs);
+		pnlInfo.add(tfserver, cs);
 
 		// Put in event
 		cs.gridx = 0;		// top
@@ -71,52 +91,116 @@ public class IndicoAPILoginDialog extends JDialog{
 		cs.gridwidth = 1;	
 		cs.insets = new Insets(3,10,3,3);
 		pnlInfo.add(new JLabel("Event ID:"), cs);
-		this.tfevent = new JTextField(20);
+		tfevent = new JTextField(20);
 		cs.gridx = 1;
 		cs.gridy = 1;
 		cs.gridwidth = 2;	// make bag broader
 		cs.insets = new Insets(3,3,3,10);
-		pnlInfo.add(this.tfevent, cs);
+		pnlInfo.add(tfevent, cs);
 
+		JPanel authPanel = new JPanel();
+		authPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+		authPanel.setLayout(new GridBagLayout());
+		cs.gridx = 0;
+		cs.gridy = 0;
+		cs.gridwidth = 3;
+		authPanel.add(new JLabel("Authentification to indico:"), cs);
+		ButtonGroup selectAuthentification = new ButtonGroup();
+		JRadioButton oauthAuthentification = new JRadioButton("Use your indico account");
+		oauthAuthentification.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				isKeyAuth = false;
+				tfapikey.setEditable(false);
+				tfapisecret.setEditable(false);
+			}
+		});
+		oauthAuthentification.setSelected(true);
+		selectAuthentification.add(oauthAuthentification);
+		cs.gridx = 0;
+		cs.gridy = 1;
+		cs.gridwidth = 3;
+		authPanel.add(oauthAuthentification,cs);
+		JRadioButton keyAuthentification = new JRadioButton("Use API key and secret");
+		keyAuthentification.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				isKeyAuth = true;
+				// Set fields for key and secret to editable 
+				tfapikey.setEditable(true);
+				tfapisecret.setEditable(true);
+			}
+		});
+		selectAuthentification.add(keyAuthentification);
+		cs.gridx = 0;
+		cs.gridy = 2;
+		cs.gridwidth = 3;
+		authPanel.add(keyAuthentification,cs);
+				
 		// Put in API key
 		cs.gridx = 0;		// top
-		cs.gridy = 2;		// left
+		cs.gridy = 3;		// left
 		cs.gridwidth = 1;	
 		cs.insets = new Insets(3,10,3,3);
-		pnlInfo.add(new JLabel("API key:"), cs);
-		this.tfapikey = new JTextField(20);
+		authPanel.add(new JLabel("API key:"), cs);
+		tfapikey = new JTextField(20);
+		tfapikey.setEditable(false);
 		cs.gridx = 1;
-		cs.gridy = 2;
+		cs.gridy = 3;
 		cs.gridwidth = 2;	// make bag broader
 		cs.insets = new Insets(3,3,3,10);
-		pnlInfo.add(this.tfapikey, cs);
+		authPanel.add(tfapikey, cs);
 		
 		// Put in API secret
 		cs.gridx = 0;	// start second row
-		cs.gridy = 3;
+		cs.gridy = 4;
 		cs.gridwidth = 1;
 		cs.insets = new Insets(3,10,10,3);
-		pnlInfo.add(new JLabel("API secret:"), cs);
-		this.tfapisecret = new JTextField(20);
+		authPanel.add(new JLabel("API secret:"), cs);
+		tfapisecret = new JTextField(20);
+		tfapisecret.setEditable(false);
 		cs.gridx = 1;
-		cs.gridy = 3;
+		cs.gridy = 4;
 		cs.gridwidth = 2;
 		cs.insets = new Insets(3,3,10,10);
-		pnlInfo.add(this.tfapisecret, cs);
+		authPanel.add(tfapisecret, cs);
 		
-		this.btnconfirm = new JButton("Confirm");
-		this.btnconfirm.addActionListener(new ActionListener(){
-
+		JButton btnconfirm = new JButton("Confirm");
+		btnconfirm.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(!( tfapikey.getText().isEmpty() || tfapisecret.getText().isEmpty() 
-						|| tfserver.getText().isEmpty() || tfevent.getText().isEmpty() )){
-					// check if the event ID is an integer
+				IndicoAuthentificationLayer authLayer = null;
+				boolean isDispose = false;
+				if(!(tfserver.getText().isEmpty() || tfevent.getText().isEmpty())){
 					try{
+						// check if the event ID is an integer
 						Integer.parseInt(tfevent.getText());
-						infoset = true;
+						if(isKeyAuth){
+							// Use Key authentification
+							if(!(tfapikey.getText().isEmpty() || tfapisecret.getText().isEmpty())){
+								IndicoKeyAuthLayer myAuthLayer = new IndicoKeyAuthLayer();
+								myAuthLayer.setApikey(tfapikey.getText().replace(" ", ""));
+								myAuthLayer.setApisecret(tfapisecret.getText().replace(" ", ""));
+								authLayer = myAuthLayer;
+								isDispose = true;
+							} else {
+								
+								isDispose = false;
+							}
+						} else {
+							// Use OAuth Authentification
+							IndicoOAuthLayer myAuthLayer = new IndicoOAuthLayer();
+							myAuthLayer.login(tfserver.getText().replace(" ", ""));
+							authLayer = myAuthLayer;
+							isDispose = true;
+						}
+						
 					} catch(NumberFormatException o){
+						isDispose = false;
 						JOptionPane.showMessageDialog(IndicoAPILoginDialog.this, "Invalid information: Event ID has to be a number");
+					} catch(IndicoAuthException o){
+						isDispose = false;
+						JOptionPane.showMessageDialog(IndicoAPILoginDialog.this, "Failed login to indico: " + o.getMessage());
 					}
 				} else {
 					// Not all information set
@@ -131,21 +215,19 @@ public class IndicoAPILoginDialog extends JDialog{
 					if(!tfapisecret.getText().isEmpty()){
 						tfapisecret.setText("");
 					}
-					infoset = false;
+					isDispose = false;
 				}
-				dispose();
-				// Return to parent
-				parentFrame.setEnabled(true);
-				if(infoset){
-					parentFrame.processLoginReturn(new IndicoLoginData(tfserver.getText(), Integer.parseInt(tfevent.getText()), tfapikey.getText(), tfapisecret.getText()));
+				if(isDispose){
+					dispose();
+					// Return to parent
+					parentFrame.setEnabled(true);
+					parentFrame.processLoginReturn(new IndicoLoginData(tfserver.getText(), Integer.parseInt(tfevent.getText()), authLayer));
 				}
 			}
-			
 		});
 		
-		this.btncancel = new JButton("Cancel");
-		this.btncancel.addActionListener(new ActionListener(){
-
+		JButton btncancel = new JButton("Cancel");
+		btncancel.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				/*
@@ -163,58 +245,20 @@ public class IndicoAPILoginDialog extends JDialog{
 				dispose();
 				parentFrame.setEnabled(true);
 			}
-			
 		});
 		
 		// Add buttons to new panel group
 		JPanel pnlBtns = new JPanel();
-		pnlBtns.add(this.btnconfirm);
-		pnlBtns.add(this.btncancel);
+		pnlBtns.add(btnconfirm);
+		pnlBtns.add(btncancel);
 		
 		// Finish Window
-		this.getContentPane().add(pnlInfo, BorderLayout.CENTER);
+		this.getContentPane().add(pnlInfo, BorderLayout.NORTH);
+		this.getContentPane().add(authPanel, BorderLayout.CENTER);
 		this.getContentPane().add(pnlBtns, BorderLayout.PAGE_END);
 		this.pack();
 		this.setResizable(false);
 		this.setLocationRelativeTo(owner);
 	}
 	
-	public String getServerAddress(){
-		/*
-		 * Return http(s) address of the server
-		 */
-		return tfserver.getText().replace(" ", "");
-	}
-	
-	public int getEventID(){
-		/*
-		 * Return event ID
-		 */
-		if(infoset){
-			return Integer.parseInt(tfevent.getText());
-		} else {
-			return -1;
-		}
-	}
-
-	public String getAPIkey(){
-		/*
-		 * Return API key
-		 * remove whitespaces
-		 */
-		return this.tfapikey.getText().replace(" ", "");
-	}
-	
-	public String getAPIsecret(){
-		/*
-		 * Return API secret
-		 * remove whitespaces
-		 */
-		return this.tfapisecret.getText().replace(" ", "");
-	}
-	
-	public boolean isInfoSet(){
-		return this.infoset;
-	}
-
 }
