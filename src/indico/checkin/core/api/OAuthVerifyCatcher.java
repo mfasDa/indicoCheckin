@@ -87,7 +87,7 @@ public class OAuthVerifyCatcher implements Runnable{
 			ServerSocket server = new ServerSocket(8000);
 			Socket client = server.accept();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
-			PrintWriter writer = new PrintWriter(client.getOutputStream());
+			PrintWriter writer = new PrintWriter(client.getOutputStream(),true);
 			String line = "";
 			while ((line = reader.readLine()) != null){
 				if(line.length() != 0){
