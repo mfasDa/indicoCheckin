@@ -5,6 +5,7 @@ package indico.checkin.core.export;
 
 import indico.checkin.core.data.IndicoRegistrant;
 
+import java.io.File;
 import java.io.FileOutputStream;
 
 import com.itextpdf.text.Anchor;
@@ -27,8 +28,8 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 
 public class PdfExporter {
-
-	 private static String path = "/home/steffen/Documents/Sonstiges/qm2014/pdfs";
+	
+	 private static String path = "temp/pdfExport/";
 	 private String fileName;
 	 private IndicoRegistrant registrant;
 	 private int template = 1;
