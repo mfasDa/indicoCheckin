@@ -17,6 +17,7 @@ import indico.checkin.core.data.IndicoEventRegistrantList;
 import indico.checkin.core.data.IndicoLoginData;
 import indico.checkin.core.data.IndicoParsedETicket;
 import indico.checkin.core.data.IndicoRegistrant;
+import indico.checkin.core.export.PdfExporter;
 
 import javax.swing.JFrame;
 import javax.swing.JButton;
@@ -56,6 +57,10 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 	
 	// connection to indico server
 	private IndicoAPIConnector indicoConnection;
+	
+	
+	// pdf export
+	private PdfExporter pdfExporter = new PdfExporter();
 	
 	public IndicoCheckinAppMainGui(){
 		// Default constructor
@@ -224,18 +229,21 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 			handleLogin();
 		} else if(arg0.getActionCommand().equals("apiinfo")){
 			showApiInfoDialog();
-		} else if(arg0.getActionCommand().equals("exit"))
+		} else if(arg0.getActionCommand().equals("exit")){
 			handleExit();
-		else if(arg0.getActionCommand().equals("newUser"))
+		}else if(arg0.getActionCommand().equals("newUser")){
 			newUserClicked();
-		else if(arg0.getActionCommand().equals("changePayment"))
+		}else if(arg0.getActionCommand().equals("changePayment")){
 			changePaymentClicked();
-		else if(arg0.getActionCommand().equals("checkin"))
+		}else if(arg0.getActionCommand().equals("checkin")){
 			handleCheckinButton();
-		else if(arg0.getActionCommand().equals("cancel")){
+		}else if(arg0.getActionCommand().equals("cancel")){
 			handleCancel();
-		} else if(arg0.getActionCommand().equals("manualSearch"))
+		} else if(arg0.getActionCommand().equals("manualSearch")){
 			handleManualSearch();
+		}else if(arg0.getActionCommand().equals("generateTicket")){
+			handleGenerateTicket();
+		}
 	}
 
 	@Override
@@ -518,6 +526,12 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		finishBarcodeThread();
 	}
 
+	public void handleGenerateTicket(){
+		pdfExporter.setRegistrant(current);
+		pdfExporter.exportPdf();
+	}
+	
+	
 	public void finishBarcodeThread(){
 		/*
 		 * enable new user button
