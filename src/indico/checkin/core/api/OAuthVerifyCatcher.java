@@ -94,7 +94,7 @@ public class OAuthVerifyCatcher implements Runnable{
 					if(line.contains("GET")){
 						// read the verifier token
 						Map<String,String> params = ExtractGetParamters(line);
-						writer.write("<html><head><title>Finished</title></head><body>Please go back to your application</body></html>");
+						sendResponse(writer, "<html><head><title>Finished</title></head><body><h1>Authentification successfull!</h1><p>Please go back to the indico checkin application.</p></body></html>");
 						String myVerifier = null;
 						if((myVerifier = params.get("oauth_verifier")) != null){
 							verifier = myVerifier;
@@ -104,6 +104,7 @@ public class OAuthVerifyCatcher implements Runnable{
 				}
 			}
 			reader.close();
+			writer.close();
 			client.close();
 			server.close();
 		} catch (IOException e) {
@@ -154,6 +155,21 @@ public class OAuthVerifyCatcher implements Runnable{
 		int delim = paramstring.indexOf("=");
 		Pair result = new Pair(paramstring.substring(0, delim),paramstring.substring(delim+1));
 		return result;
+	}
+	
+	/**
+	 * Send response to the web browser indication that the authentification
+	 * was successfull. Generates the response header.
+	 * 
+	 * @param writer: Output stream of the client.
+	 * @param body: The response body.
+	 */
+	private void sendResponse(PrintWriter writer, String body){
+		System.out.println("Called");
+		writer.print("HTTP/1.1 200 OK\r\n");
+		writer.print("Content-Type: text/html\r\n\r\n");
+		//writer.println(String.format("Content-Length: %d\r\n", body.length()));
+		writer.println(body);
 	}
 
 }

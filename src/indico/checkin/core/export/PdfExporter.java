@@ -29,7 +29,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 public class PdfExporter {
 	
-	 private static String path = "temp/pdfExport/";
+	 private static String path = System.getProperty("java.io.tmpdir");
 	 private String fileName;
 	 private IndicoRegistrant registrant;
 	 private int template = 1;
