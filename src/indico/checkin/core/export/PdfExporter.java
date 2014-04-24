@@ -54,17 +54,17 @@ import com.itextpdf.text.pdf.PdfStamper;
 
 
 public class PdfExporter {
-
 /**
  * Exporter class 
  * loads template and fills it with registrant information
  * 
  * @author: Steffen Weber
  */
-	 private static String exportPath = "pdf";
+	 private static String exportPath = System.getProperty("java.io.tmpdir");
 	 private String exportFileName;
 	 private static String templatePath = "templates";
 	 private String templateFileName = "template-test.pdf";
+
 	 private IndicoRegistrant registrant;
 	 
 
