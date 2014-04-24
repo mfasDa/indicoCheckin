@@ -24,8 +24,30 @@ package indico.checkin.core.export;
 
 import indico.checkin.core.data.IndicoRegistrant;
 
+import java.io.File;
+//import java.awt.print.PrinterJob;
 import java.io.FileOutputStream;
 
+
+
+
+
+
+
+import java.net.MalformedURLException;
+
+import javax.print.DocFlavor;
+import javax.print.DocPrintJob;
+import javax.print.PrintService;
+import javax.print.PrintServiceLookup;
+import javax.print.SimpleDoc;
+
+
+
+
+
+
+//import com.itextpdf.text.Document;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfStamper;
 
@@ -75,20 +97,47 @@ public class PdfExporter {
 	 }
 	 
 	 
-	 
+
 	 public void exportPdf(){
 		 try {			 
 			 PdfReader reader = new PdfReader( getFullTemplateFileName() );
 			 PdfStamper stamper = new PdfStamper(reader, new FileOutputStream( getFullExportFileName() ));
+			 
 			 stamper.getAcroFields().setField("FirstName", registrant.getFirstName());
 			 stamper.getAcroFields().setField("Surname", registrant.getSurname());
 			 stamper.getAcroFields().setField("Institution", registrant.getInstitution());
 			 stamper.getAcroFields().setField("ID", String.valueOf(registrant.getID()) );
+			// stamper.setFormFlattening(true);
 			 stamper.close();
 			 reader.close();
 			 System.out.println("pdf created");
 			 
 		 } catch (Exception e) {
+			 System.out.println("Error while creating the pdf.");
+
+		      e.printStackTrace();
+		 }
+	 }
+	 
+	 public void printPdf() throws MalformedURLException{
+		 File pdfFile = new File(getFullExportFileName());
+		 SimpleDoc simpleDoc = new SimpleDoc(pdfFile.toURI().toURL(),  DocFlavor.URL.PDF , null);
+	 
+		 PrintService defaultPrintService = PrintServiceLookup.lookupDefaultPrintService();
+		 try {			
+			 if(defaultPrintService == null){
+				System.out.println("no default printer!");
+				return;
+			 }
+			 DocPrintJob printerJob = defaultPrintService.createPrintJob();
+			 printerJob.print(simpleDoc, null);
+			 
+			 
+			 System.out.println("pdf printed");
+			 
+		 } catch (Exception e) {
+			 System.out.println("Error while printing the pdf. " + defaultPrintService.getName());
+
 		      e.printStackTrace();
 		 }
 	 }
