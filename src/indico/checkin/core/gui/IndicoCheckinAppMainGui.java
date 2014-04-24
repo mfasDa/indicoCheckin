@@ -25,7 +25,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.net.MalformedURLException;
 
 import indico.checkin.core.api.IndicoAPIConnector;
 import indico.checkin.core.api.IndicoPostException;
@@ -542,16 +541,16 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		finishBarcodeThread();
 	}
 
+	/**
+	 * User pressed generate ticket:
+	 * export pdf file, try to print it, if not successful open it
+	 */
 	public void handleGenerateTicket(){
 		pdfExporter.setRegistrant(current);
 		pdfExporter.exportPdf();
-		try {
-			pdfExporter.printPdf();
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if( !pdfExporter.printPdf()){
+			pdfExporter.openPdf();
 		}
-		
 		
 	}
 	

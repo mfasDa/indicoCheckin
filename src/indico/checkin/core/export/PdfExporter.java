@@ -29,10 +29,6 @@ import java.io.File;
 //import java.awt.print.PrinterJob;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
-
-
-
 //import com.itextpdf.text.Document;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfStamper;
@@ -100,63 +96,49 @@ public class PdfExporter {
 			 
 		 } catch (Exception e) {
 			 System.out.println("Error while creating the pdf.");
-
-		      e.printStackTrace();
 		 }
 	 }
 	 
-	 public void printPdf() throws MalformedURLException{
-	/*	 
-		 InputStream is;
-		 PrintService defaultPrintService = PrintServiceLookup.lookupDefaultPrintService();
-		try {
-			is = new BufferedInputStream(new FileInputStream(getFullExportFileName() ));
-			//File pdfFile = new File(getFullExportFileName());
-			SimpleDoc simpleDoc = new SimpleDoc(is,  DocFlavor.INPUT_STREAM.PDF , null);		
-			 if(defaultPrintService == null){
-				System.out.println("no default printer!");
-				return;
-			 }
-			 DocPrintJob printerJob = defaultPrintService.createPrintJob();
-			 printerJob.print(simpleDoc, null);
-			 
-			 
-			 System.out.println("pdf printed");
-			 is.close();
-		 } catch (PrintException e) {
-			 System.out.println("Error while printing the pdf. Printer: " + defaultPrintService.getName());
-
-		      e.printStackTrace();
-		 }catch (FileNotFoundException e1) {
-				// TODO Auto-generated catch block
-				System.out.println("File not Found!");
-		}catch (IOException e1) {
-			// TODO Auto-generated catch block
-			System.out.println("I/O Exception!");
-	}
-		*/	
+	 public Boolean printPdf(){
 		 
-		 if (Desktop.isDesktopSupported()) {
+		 if (!Desktop.isDesktopSupported()) {
+			System.out.println("Desktop not supported!");
+			 return false;
+			 
+		 }
+		 else{
 			    try {
 			        Desktop.getDesktop().print(new File(getFullExportFileName()));
 			    } catch (UnsupportedOperationException e) {
 					System.out.println("No default pdf printing command, opening pdf instead!");
-			    	try{
-			    		Desktop.getDesktop().open(new File(getFullExportFileName()));
-			    	}
-			    	catch(UnsupportedOperationException e1){
-						System.out.println("No default pdf viewer!");
-			    	}
-			    	catch(IOException e3){
-						System.out.println("I/O Exception while opening pdf!");
-			    	}
+			    	return false;
 			    }
-		    	catch(IOException e4){
+		    	catch(IOException e){
 					System.out.println("I/O Exception while printing pdf!!");
+			    	return false;
+		    	}
+
+		    	return true;
+			}
+			 
+	 }	
+	 
+	 public void openPdf() {
+		 
+		 if (!Desktop.isDesktopSupported()) {
+				System.out.println("Desktop not supported!");
+			 }
+			 else{
+			    try {
+			        Desktop.getDesktop().open(new File(getFullExportFileName()));
+			    }
+		    	catch(UnsupportedOperationException e){
+					System.out.println("No default pdf viewer!");
+		    	}
+		    	catch(IOException e){
+					System.out.println("I/O Exception while opening pdf!!");
 		    	}
 			}
-		 
-		 
 			 
 	 }
 
