@@ -24,26 +24,12 @@ package indico.checkin.core.export;
 
 import indico.checkin.core.data.IndicoRegistrant;
 
+import java.awt.Desktop;
 import java.io.File;
 //import java.awt.print.PrinterJob;
 import java.io.FileOutputStream;
-
-
-
-
-
-
-
+import java.io.IOException;
 import java.net.MalformedURLException;
-
-import javax.print.DocFlavor;
-import javax.print.DocPrintJob;
-import javax.print.PrintService;
-import javax.print.PrintServiceLookup;
-import javax.print.SimpleDoc;
-
-
-
 
 
 
@@ -110,7 +96,7 @@ public class PdfExporter {
 			// stamper.setFormFlattening(true);
 			 stamper.close();
 			 reader.close();
-			 System.out.println("pdf created");
+			 System.out.println("pdf created: " + getFullExportFileName() );
 			 
 		 } catch (Exception e) {
 			 System.out.println("Error while creating the pdf.");
@@ -120,11 +106,13 @@ public class PdfExporter {
 	 }
 	 
 	 public void printPdf() throws MalformedURLException{
-		 File pdfFile = new File(getFullExportFileName());
-		 SimpleDoc simpleDoc = new SimpleDoc(pdfFile.toURI().toURL(),  DocFlavor.URL.PDF , null);
-	 
+	/*	 
+		 InputStream is;
 		 PrintService defaultPrintService = PrintServiceLookup.lookupDefaultPrintService();
-		 try {			
+		try {
+			is = new BufferedInputStream(new FileInputStream(getFullExportFileName() ));
+			//File pdfFile = new File(getFullExportFileName());
+			SimpleDoc simpleDoc = new SimpleDoc(is,  DocFlavor.INPUT_STREAM.PDF , null);		
 			 if(defaultPrintService == null){
 				System.out.println("no default printer!");
 				return;
@@ -134,12 +122,42 @@ public class PdfExporter {
 			 
 			 
 			 System.out.println("pdf printed");
-			 
-		 } catch (Exception e) {
-			 System.out.println("Error while printing the pdf. " + defaultPrintService.getName());
+			 is.close();
+		 } catch (PrintException e) {
+			 System.out.println("Error while printing the pdf. Printer: " + defaultPrintService.getName());
 
 		      e.printStackTrace();
-		 }
+		 }catch (FileNotFoundException e1) {
+				// TODO Auto-generated catch block
+				System.out.println("File not Found!");
+		}catch (IOException e1) {
+			// TODO Auto-generated catch block
+			System.out.println("I/O Exception!");
+	}
+		*/	
+		 
+		 if (Desktop.isDesktopSupported()) {
+			    try {
+			        Desktop.getDesktop().print(new File(getFullExportFileName()));
+			    } catch (UnsupportedOperationException e) {
+					System.out.println("No default pdf printing command, opening pdf instead!");
+			    	try{
+			    		Desktop.getDesktop().open(new File(getFullExportFileName()));
+			    	}
+			    	catch(UnsupportedOperationException e1){
+						System.out.println("No default pdf viewer!");
+			    	}
+			    	catch(IOException e3){
+						System.out.println("I/O Exception while opening pdf!");
+			    	}
+			    }
+		    	catch(IOException e4){
+					System.out.println("I/O Exception while printing pdf!!");
+		    	}
+			}
+		 
+		 
+			 
 	 }
 
 	 

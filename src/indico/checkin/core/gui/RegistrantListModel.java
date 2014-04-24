@@ -94,6 +94,7 @@ public class RegistrantListModel extends AbstractTableModel {
 			/*
 			 * checks if the last name starts with the given string
 			 */
+			if(str.length() > lastname.length()) return false;
 			String lastnamesub = lastname.substring(0, str.length()).toLowerCase();
 			if(lastnamesub.equals(str.toLowerCase())) return true;
 			else return false;
