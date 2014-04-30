@@ -24,18 +24,19 @@ package indico.checkin.core.export;
 import indico.checkin.core.data.IndicoRegistrant;
 
 import java.awt.Desktop;
-import java.awt.print.PrinterException;
-import java.awt.print.PrinterJob;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.util.List;
 
-import javax.print.attribute.HashPrintRequestAttributeSet;
-import javax.print.attribute.PrintRequestAttributeSet;
+import javax.print.DocFlavor;
+import javax.print.DocPrintJob;
+import javax.print.PrintException;
+import javax.print.PrintService;
+import javax.print.PrintServiceLookup;
+import javax.print.SimpleDoc;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
-import org.apache.pdfbox.pdmodel.PDPageable;
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
 import org.apache.pdfbox.pdmodel.interactive.form.PDField;
 
@@ -92,32 +93,33 @@ public class PdfExporter {
 	 * 
 	 * 
 	 */
-	public void exportPdf() {
+	public boolean exportPdf() {
 		try {
 			PDDocument pdDoc = PDDocument.load(new File(getFullTemplateFileName()));
 	        PDDocumentCatalog pdCatalog = pdDoc.getDocumentCatalog();
 	        PDAcroForm acroForm = pdCatalog.getAcroForm();
 	        
-	        @SuppressWarnings("unchecked")
-			List<PDField> fields = acroForm.getFields();
+	        if( acroForm != null){
+	        	@SuppressWarnings("unchecked")
+	        	List<PDField> fields =  acroForm.getFields();
 	        
-	        for (PDField field : fields) {
-	            switch(field.getFullyQualifiedName()){
-	            case "FirstName":
-	            	 field.setValue(registrant.getFirstName());
-	            	 break;
-	            case "Surname":
-	            	 field.setValue(registrant.getSurname());
-	            	 break;
-	            case "Institution":
-	            	 field.setValue(registrant.getInstitution());
-	            	 break;
-	            case "ID":
-	            	 field.setValue(String.valueOf(registrant.getID()));
-	            	 break;
-	            }   
+		        for (PDField field : fields) {
+		            switch(field.getFullyQualifiedName()){
+		            case "FirstName":
+		            	 field.setValue(registrant.getFirstName());
+		            	 break;
+		            case "Surname":
+		            	 field.setValue(registrant.getSurname());
+		            	 break;
+		            case "Institution":
+		            	 field.setValue(registrant.getInstitution());
+		            	 break;
+		            case "ID":
+		            	 field.setValue(String.valueOf(registrant.getID()));
+		            	 break;
+		            }   
+		        }
 	        }
-	        
 	        pdDoc.save(getFullExportFileName());
 	        pdDoc.close();
 	        System.out.println("pdf created: " + getFullExportFileName());
@@ -125,44 +127,11 @@ public class PdfExporter {
 		} catch (Exception e) {
 			System.out.println("Error while creating the pdf.");
 			e.printStackTrace();
+			return false;
 		}
+		return true;
 	}
 	
-	
-	/*
-	public void exportPdfOld() {
-		try {
-			PdfReader reader = new PdfReader(getFullTemplateFileName());
-			PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(
-					getFullExportFileName()));
-
-			stamper.setFormFlattening(true);
-			if(stamper.getAcroFields().getField("FirstName") != null)
-				stamper.getAcroFields().setField("FirstName", registrant.getFirstName());
-			if(stamper.getAcroFields().getField("Surname") != null)
-				stamper.getAcroFields().setField("Surname", registrant.getSurname());
-			if(stamper.getAcroFields().getField("Institution") != null)
-				stamper.getAcroFields().setField("Institution", registrant.getInstitution());
-			if(stamper.getAcroFields().getField("ID") != null)
-				stamper.getAcroFields().setField("ID", String.valueOf(registrant.getID()));
-			if(stamper.getAcroFields().getField("TEST") != null)
-				stamper.getAcroFields().setField("TEST", String.valueOf(registrant.getID()));
-		
-			//PdfAction action = new PdfAction(PdfAction.PRINTDIALOG);
-			//PdfWriter writer = stamper.getWriter();
-			//writer.setOpenAction(action);
-			//writer.close();
-			stamper.close();
-			
-			reader.close();
-			System.out.println("pdf created: " + getFullExportFileName());
-
-		} catch (Exception e) {
-			System.out.println("Error while creating the pdf.");
-			e.printStackTrace();
-		}
-	}
-
 	public Boolean printPdf2() {
 		if (!Desktop.isDesktopSupported()) {
 			System.out.println("Desktop not supported!");
@@ -181,9 +150,8 @@ public class PdfExporter {
 		}
 		return true;
 	}
-*/
 
-	public Boolean openPdf() {
+	public boolean openPdf() {
 
 		if (!Desktop.isDesktopSupported()) {
 			System.out.println("Desktop not supported!");
@@ -203,43 +171,23 @@ public class PdfExporter {
 	}
 	
 	
-	public Boolean printPdf(){
-	
-
-        try {
-        	
-        	PDDocument document = PDDocument.load(getFullExportFileName() );
-        	
-        	
-        	
-        PrinterJob job = PrinterJob.getPrinterJob();
-        PrintRequestAttributeSet aset = new HashPrintRequestAttributeSet();
-        
-        job.setPageable(new PDPageable(document, job));
-        boolean ok = job.printDialog(aset);
-        
-        if (ok) {
-        	job.print(aset);
-        }
-        else{
-        	System.out.println("printing canceld by user!");
-        	return false;
-        	
-        }} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
+	public boolean printPdf(){
+		try {
+		 PrintService defaultPrintService = PrintServiceLookup.lookupDefaultPrintService();
+	      DocPrintJob printerJob = defaultPrintService.createPrintJob();
+	      File pdfFile = new File(getFullExportFileName());
+	      SimpleDoc simpleDoc= new SimpleDoc(pdfFile.toURI().toURL(), DocFlavor.URL.AUTOSENSE, null);
+	      printerJob.print(simpleDoc, null);
+		} catch (PrintException e) {
+			System.out.println("Error while printing!");
 			e.printStackTrace();
 			return false;
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-            return false;
-		}catch (PrinterException e) {
-            System.out.println("PrinterException!!!");
+		}catch (MalformedURLException e) {
+			System.out.println("Error while printing!");
 			e.printStackTrace();
-            return false;
-           }
+			return false;
+		}
+		
 		return true;
 		
 	}

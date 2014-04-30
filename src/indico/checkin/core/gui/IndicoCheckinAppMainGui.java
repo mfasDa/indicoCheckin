@@ -547,9 +547,10 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 	 */
 	public void handleGenerateTicket(){
 		pdfExporter.setRegistrant(current);
-		pdfExporter.exportPdf();
-		if( !pdfExporter.printPdf()){
-			pdfExporter.openPdf();
+		if( pdfExporter.exportPdf()){
+			if( !pdfExporter.printPdf()){
+				pdfExporter.openPdf();
+			}
 		}
 		
 	}
