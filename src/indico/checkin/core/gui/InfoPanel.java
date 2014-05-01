@@ -20,6 +20,7 @@ package indico.checkin.core.gui;
 import indico.checkin.core.data.IndicoRegistrant;
 
 import java.awt.BorderLayout;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -53,6 +54,7 @@ public class InfoPanel extends JPanel implements ListSelectionListener{
 	public InfoPanel(JFrame parentFrame){
 		this.setLayout(new BorderLayout());
 		this.parentFrame = parentFrame;
+
 		webcampanel = new WebcamImagePanel(Webcam.getDefault());
 		//webcampanel.setPreferredSize(new Dimension(600, 400));
 		this.add(webcampanel, BorderLayout.WEST);
@@ -69,6 +71,12 @@ public class InfoPanel extends JPanel implements ListSelectionListener{
 	
 	public WebcamImagePanel getWebcamPanel(){
 		return webcampanel;
+	}
+	
+	public void setWebcam(int webcamID){
+		List<Webcam> listofwebcams = Webcam.getWebcams();
+		if(webcamID >= 0 && webcamID < listofwebcams.size())
+		webcampanel.SetWebcam(listofwebcams.get(webcamID));
 	}
 	
 	public JTable getUserData(){

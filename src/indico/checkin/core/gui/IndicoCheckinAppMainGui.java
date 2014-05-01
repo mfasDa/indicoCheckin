@@ -42,6 +42,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
+import com.github.sarxos.webcam.Webcam;
+
 /**
  * Class respresenting the main window of the checkin app GUI
  * @author Markus Fasel
@@ -71,6 +73,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 	private RegistrantListModel manualSearchModel;
 	
 	private boolean isLoggedIn;
+	private boolean hasWebcam;
 	
 	// connection to indico server
 	private IndicoAPIConnector indicoConnection;
@@ -99,6 +102,10 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		newregthread = null;
 		
 		isLoggedIn = false;
+		hasWebcam = Webcam.getWebcams().size() > 0;
+		if(!hasWebcam){
+			JOptionPane.showMessageDialog(this, "No webcam detected - only manual search possible");
+		}
 	}
 
 	/**
@@ -134,6 +141,16 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		abcs.gridx = 0;
 		abcs.gridy = 1;
 		userButtonPanel.add(this.apiinfobutton, abcs);
+		
+		JButton searchWebcamButton = new JButton("Select Webcam");
+		searchWebcamButton.setActionCommand("searchWebcam");
+		searchWebcamButton.addActionListener(this);
+		GridBagConstraints ebsw = new GridBagConstraints();
+		ebsw.fill = GridBagConstraints.HORIZONTAL;
+		ebsw.gridx = 0;
+		ebsw.gridy = 2;
+		userButtonPanel.add(searchWebcamButton, ebsw);
+
 
 		JButton exitbutton = new JButton("Exit");
 		exitbutton.setActionCommand("exit");
@@ -141,9 +158,8 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		GridBagConstraints ebcs = new GridBagConstraints();
 		ebcs.fill = GridBagConstraints.HORIZONTAL;
 		ebcs.gridx = 0;
-		ebcs.gridy = 2;
-		userButtonPanel.add(exitbutton, ebcs);
-
+		ebcs.gridy = 3;
+		userButtonPanel.add(exitbutton, ebcs);	
 				
 		// Define panel for new user checkin process
 		JPanel processPanel = new JPanel(new GridBagLayout());
@@ -260,6 +276,8 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 			handleManualSearch();
 		}else if(arg0.getActionCommand().equals("generateTicket")){
 			handleGenerateTicket();
+		}else if(arg0.getActionCommand().equals("searchWebcam")){
+			handleSelectWebcam();
 		}
 	}
 
@@ -358,7 +376,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 						String.format("Found %d registrants for event %s", 
 								this.registrants.getNumberOfRegistrants(), 
 								this.indicoConnection.getEventID()));
-				this.newUserButton.setEnabled(true);
+				if(hasWebcam) this.newUserButton.setEnabled(true);
 				this.loginbutton.setEnabled(false);
 				this.manualSearchButton.setEnabled(true);
 				this.isLoggedIn = true;
@@ -565,6 +583,16 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 			newregthread = null;
 		}
 	}
+	
+	private void handleSelectWebcam() {
+		// TODO Auto-generated method stub
+		WebcamSelectionDialog webcamsel = new WebcamSelectionDialog(this);
+		webcamsel.setVisible(true);
+		int result = webcamsel.getSelectedWebcamID();
+		if(result >= 0) 
+			infopanel.setWebcam(result);
+	}
+
 	
 	public void setTicket(IndicoParsedETicket ticket){
 		eticket = ticket;
