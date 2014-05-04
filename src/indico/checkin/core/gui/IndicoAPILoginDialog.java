@@ -80,6 +80,7 @@ public class IndicoAPILoginDialog extends JDialog{
 		pnlInfo.add(new JLabel("Server:"), cs);
 		tfserver = new JTextField(20);
 		tfserver.setEditable(true);
+		tfserver.setText("https://indico.cern.ch");
 		cs.gridx = 1;
 		cs.gridy = 0;
 		cs.gridwidth = 2;	// make bag broader
@@ -93,6 +94,7 @@ public class IndicoAPILoginDialog extends JDialog{
 		cs.insets = new Insets(3,10,3,3);
 		pnlInfo.add(new JLabel("Event ID:"), cs);
 		tfevent = new JTextField(20);
+		tfevent.setText("219463");
 		cs.gridx = 1;
 		cs.gridy = 1;
 		cs.gridwidth = 2;	// make bag broader
