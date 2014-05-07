@@ -50,7 +50,15 @@ public class WebcamImagePanel extends JPanel {
 	}
 	
 	public void SetWebcam(Webcam webcam){
+		boolean wasWebcamOpen = false;
+		if(this.webcam.isOpen()){
+			this.webcam.close();
+			wasWebcamOpen = true;
+		}
 		this.webcam = webcam;
+		// Open new webcam if needed
+		if(wasWebcamOpen) 
+			this.webcam.open();
 	}
 	
 	public Webcam getWebcam(){
@@ -69,6 +77,16 @@ public class WebcamImagePanel extends JPanel {
 			setImage(webcam.getImage());
 			repaint();
 		}	
+	}
+	
+	public void openWebcam(){
+		if(webcam != null)
+			webcam.open();
+	}
+	
+	public void closeWebcam(){
+		if(webcam != null && webcam.isOpen())
+			webcam.close();
 	}
 	
 	@Override

@@ -69,6 +69,14 @@ public class InfoPanel extends JPanel implements ListSelectionListener{
 		this.add(userdata, BorderLayout.EAST);
 	}
 	
+	public void openWebcam(){
+		webcampanel.openWebcam();
+	}
+	
+	public void closeWebcam(){
+		webcampanel.closeWebcam();
+	}
+	
 	public WebcamImagePanel getWebcamPanel(){
 		return webcampanel;
 	}

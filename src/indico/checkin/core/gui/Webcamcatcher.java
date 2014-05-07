@@ -43,7 +43,7 @@ public class Webcamcatcher implements Runnable {
 		System.out.println("Thread run called");
 		long timeMax = 10000;
 		Timer timer = new Timer();
-		parent.getInfoPanel().getWebcamPanel().getWebcam().open();
+		//parent.getInfoPanel().getWebcamPanel().getWebcam().open();
 		WebcamProcessor processor = new WebcamProcessor(this, parent.getInfoPanel().getWebcamPanel(), System.currentTimeMillis(), timeMax, timer);
 		timer.schedule(processor,10,100);
 		System.out.println("end run thread");

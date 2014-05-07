@@ -288,8 +288,10 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 			// Shut down new registrant thread before exiting the program
 			newregthread.interrupt();
 		}
-		if(JOptionPane.showConfirmDialog(null, "Close Program?") == JOptionPane.OK_OPTION)
+		if(JOptionPane.showConfirmDialog(null, "Close Program?") == JOptionPane.OK_OPTION){
+			this.infopanel.closeWebcam();
 			this.dispose();
+		}
 	}
 	
 	/**
@@ -345,6 +347,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 								this.indicoConnection.getEventID()));
 			}
 			this.apiinfobutton.setEnabled(true);
+			this.infopanel.openWebcam();
 		}
 
 	}
@@ -514,12 +517,6 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 	private void beep(int number){
 		for(int i = 0; i < number; i++){
 			java.awt.Toolkit.getDefaultToolkit().beep();
-			try {
-				Thread.currentThread().sleep(1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 		}
 	}
 	

@@ -78,13 +78,13 @@ public class WebcamProcessor extends TimerTask {
 			}
 		} else {
 			// Ticket was already read in successfully, terminate timer
-			webcampanel.getWebcam().close();
+			//webcampanel.getWebcam().close();
 			parent.cancel();
 			catcher.timerReturn(ticket);
 		}
 		// in any case, termiate timer if after limit is reached
 		if(System.currentTimeMillis() - starttime > limit){
-			webcampanel.getWebcam().close();
+			//webcampanel.getWebcam().close();
 			parent.cancel();
 			catcher.timerReturn(ticket);
 		}
