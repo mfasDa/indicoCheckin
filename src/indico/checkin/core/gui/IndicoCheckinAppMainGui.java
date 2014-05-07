@@ -498,10 +498,11 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 				// checkin successfull
 				infopanel.UpdateRegistrantDisplay();
 				handleGenerateTicket();
-			} else
-				JOptionPane.showMessageDialog(this, String.format("Checkin of registrant %s was not successfull", current.getFullName()));
+			} else {
+				beep(3);
+			}
 		} catch (IndicoPostException e) {
-			JOptionPane.showMessageDialog(this, String.format("Checkin failure: %s", e.getMessage()));
+			beep(3);
 		}
 	}
 	
