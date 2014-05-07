@@ -149,7 +149,6 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		ebsw.gridy = 1;
 		userButtonPanel.add(searchWebcamButton, ebsw);
 
-
 		JButton exitbutton = new JButton("Exit");
 		exitbutton.setActionCommand("exit");
 		exitbutton.addActionListener(this);
@@ -397,12 +396,6 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		}
 	}
 	
-	public void printTicketClicked(){
-		/*
-		 * Handle click to printTicket button
-		 */
-	}
-
 	/**
 	 * Open dialog with a list of all registrants where the user can search
 	 * a given registrant by the name. In case a registrant is selected, the same
@@ -417,24 +410,28 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 			if(current != null){
 				try{
 					this.indicoConnection.fetchFullRegistrantInformation(current);
-					this.infopanel.UpdateRegistrantData(current);
 
 					if(current.hasPaid()){
 						// if the registrant has already payed checkin
 						// TODO: remove printout when debugging finished
 						System.out.println("Registrant has already paid");
-						if(!current.hasCheckedIn())
+						if(!current.hasCheckedIn()){
 							doCheckinAndTicket();
+							beep(1);
+						} else
+							beep(3);
 						this.changePaymentButton.setEnabled(true);
 						this.changePaymentButton.setText("Print ticket");
 					} else {
 						// Only enable button that the changes payment
 						// TODO: remove printout when debugging finished
+						beep(2);
 						System.out.println("Registrant did not yet pay");
 						this.changePaymentButton.setEnabled(true);
 						this.changePaymentButton.setText("Pay");
 					}
 
+					this.infopanel.UpdateRegistrantData(current);
 				} catch(RegistrantBuilderException e){
 					JOptionPane.showMessageDialog(this, String.format("Error accessing registration information for registrant %d", current.getID()));
 				}
@@ -453,39 +450,47 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 				System.out.printf("Fetch full information for registrant %d\n", eticket.getRegistrantID());
 				try{
 					this.indicoConnection.fetchFullRegistrantInformation(current);
-					this.infopanel.UpdateRegistrantData(current);
-				} catch (RegistrantBuilderException e){
-					JOptionPane.showMessageDialog(this, String.format("Failed reading registrant: %s", e.getMessage()));
-				}
-				JOptionPane.showMessageDialog(this, String.format("ETicket read successfully and valid: %s", current.getFullName()));				
-				if(current.hasPaid()){
-					// if the registrant has already payed, checkin and generate ticket
-					// in case the user has checked in, rename the button as Print ticket
-					// TODO: remove printout when debugging finished
-					System.out.println("Registrant has already paid");
-					if(!current.hasCheckedIn()){
-						// checkin the user
-						doCheckinAndTicket();
+					if(current.hasPaid()){
+						// if the registrant has already payed, checkin and generate ticket
+						// in case the user has checked in, rename the button as Print ticket
+						// TODO: remove printout when debugging finished
+						System.out.println("Registrant has already paid");
+						if(!current.hasCheckedIn()){
+							// checkin the user
+							beep(1);
+							doCheckinAndTicket();
+						} else {
+							// User checked in - generate ticket
+							beep(3);
+							changePaymentButton.setText("Print ticket");
+							this.changePaymentButton.setEnabled(true);
+						}
 					} else {
-						// User checked in - generate ticket
-						changePaymentButton.setText("Print ticket");
+						// Only enable button that the changes payment
+						// TODO: remove printout when debugging finished
+						System.out.println("Registrant did not yet pay");
+						beep(2);
+						this.changePaymentButton.setText("Pay");
 						this.changePaymentButton.setEnabled(true);
 					}
-				} else {
-					// Only enable button that the changes payment
-					// TODO: remove printout when debugging finished
-					System.out.println("Registrant did not yet pay");
-					this.changePaymentButton.setText("Pay");
-					this.changePaymentButton.setEnabled(true);
+					this.infopanel.UpdateRegistrantData(current);
+				} catch (RegistrantBuilderException e){
+					// Failed reading registrant
+					beep(3);
 				}
 			} else {
-				JOptionPane.showMessageDialog(this, "ETicket read successfully, but registrant not found");
+				// ETicket read successfully, but registrant not found
+				beep(3);
 			}
 		} else {
-			JOptionPane.showMessageDialog(this, "Invalid ETicket");
+			// invalid e-ticket
+			beep(3);
 		}
 	}
 	
+	/**
+	 * Checkin
+	 */
 	public void doCheckinAndTicket(){
 		try {
 			boolean status = indicoConnection.pushCheckin(current);
@@ -499,6 +504,24 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 			JOptionPane.showMessageDialog(this, String.format("Checkin failure: %s", e.getMessage()));
 		}
 	}
+	
+	/**
+	 * use beeping for error messages
+	 * 
+	 * @param number
+	 */
+	private void beep(int number){
+		for(int i = 0; i < number; i++){
+			java.awt.Toolkit.getDefaultToolkit().beep();
+			try {
+				Thread.currentThread().sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
 
 	/**
 	 * User pressed cancel:
@@ -553,7 +576,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		if(eticket != null)
 			handleEticketParsed();
 		else
-			JOptionPane.showMessageDialog(this, "Failed reading eticket");
+			beep(3);
 		if(isLoggedIn) this.newUserButton.setEnabled(true);
 	}
 	
