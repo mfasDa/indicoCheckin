@@ -113,10 +113,10 @@ public class RegistrantInfoDisplayModel extends AbstractTableModel {
 	
 	public void SetRegistrant(IndicoRegistrant reg){
 		registrant = reg;
-		this.fireTableRowsUpdated(0, 4);
+		this.fireTableRowsUpdated(0, getRowCount());
 	}
 
 	public void setInfoUpdated() {
-		this.fireTableRowsUpdated(0, 4);
+		this.fireTableRowsUpdated(0, getRowCount());
 	}
 }

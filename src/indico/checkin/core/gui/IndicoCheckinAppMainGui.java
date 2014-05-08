@@ -483,10 +483,12 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 				}
 			} else {
 				// ETicket read successfully, but registrant not found
+				JOptionPane.showMessageDialog(this, "Invalid information");
 				beep(3);
 			}
 		} else {
 			// invalid e-ticket
+			JOptionPane.showMessageDialog(this, "Invalid information");
 			beep(3);
 		}
 	}
@@ -568,11 +570,14 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 
 	
 	public void setTicket(IndicoParsedETicket ticket){
+		finishBarcodeThread();
 		eticket = ticket;
 		if(eticket != null)
 			handleEticketParsed();
-		else
+		else{
 			beep(3);
+			JOptionPane.showMessageDialog(this, "Failed reading eticket");
+		}
 		if(isLoggedIn) this.newUserButton.setEnabled(true);
 	}
 	
