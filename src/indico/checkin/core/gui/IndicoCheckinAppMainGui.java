@@ -515,9 +515,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 	 * @param number
 	 */
 	private void beep(int number){
-		for(int i = 0; i < number; i++){
-			java.awt.Toolkit.getDefaultToolkit().beep();
-		}
+		new Beeper(number);
 	}
 	
 
