@@ -58,6 +58,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 	private JButton changePaymentButton;
 	private JButton cancelButton;
 	private JButton manualSearchButton;
+	private JButton printAllButton;
 	
 	private InfoPanel infopanel;
 	
@@ -130,15 +131,27 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		lbcs.gridy = 0;
 		userButtonPanel.add(this.loginbutton, lbcs);
 		
+		
 		this.apiinfobutton = new JButton("API Info");
 		this.apiinfobutton.setActionCommand("apiinfo");
 		this.apiinfobutton.addActionListener(this);
 		this.apiinfobutton.setEnabled(false);
+		//GridBagConstraints abcs = new GridBagConstraints();
+		//abcs.fill = GridBagConstraints.HORIZONTAL;
+		//abcs.gridx = 1;
+		//abcs.gridy = 0;
+		//userButtonPanel.add(this.apiinfobutton, abcs);
+		
+		
+		this.printAllButton = new JButton("print all");
+		this.printAllButton.setActionCommand("printAll");
+		this.printAllButton.addActionListener(this);
+		this.printAllButton.setEnabled(false);
 		GridBagConstraints abcs = new GridBagConstraints();
 		abcs.fill = GridBagConstraints.HORIZONTAL;
 		abcs.gridx = 1;
 		abcs.gridy = 0;
-		userButtonPanel.add(this.apiinfobutton, abcs);
+		userButtonPanel.add(this.printAllButton, abcs);
 		
 		JButton searchWebcamButton = new JButton("Select Webcam");
 		searchWebcamButton.setActionCommand("searchWebcam");
@@ -224,6 +237,8 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 			handleLogin();
 		} else if(arg0.getActionCommand().equals("apiinfo")){
 			showApiInfoDialog();
+		} else if(arg0.getActionCommand().equals("printAll")){
+			handlePrintAll();
 		} else if(arg0.getActionCommand().equals("exit")){
 			handleExit();
 		}else if(arg0.getActionCommand().equals("newUser")){
@@ -346,7 +361,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 						String.format("No registrants for event %s", 
 								this.indicoConnection.getEventID()));
 			}
-			this.apiinfobutton.setEnabled(true);
+			this.printAllButton.setEnabled(true);
 			this.infopanel.openWebcam();
 		}
 
@@ -545,6 +560,15 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 				pdfExporter.openPdf();
 			}
 		}
+		
+	}
+
+	/**
+	 * User pressed print all:
+	 * generate and print pdfs for all registrants
+	 */
+	public void handlePrintAll(){
+		pdfExporter.printAll(registrants);
 		
 	}
 	

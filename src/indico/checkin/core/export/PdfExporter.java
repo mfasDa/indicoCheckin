@@ -21,11 +21,11 @@ package indico.checkin.core.export;
 //import java.io.FileOutputStream;
 //import java.util.Date;
 
+import indico.checkin.core.data.IndicoEventRegistrantList;
 import indico.checkin.core.data.IndicoRegistrant;
 
 import java.awt.Desktop;
 import java.io.*;
-import java.net.MalformedURLException;
 import java.util.List;
 
 import javax.print.DocFlavor;
@@ -51,6 +51,8 @@ public class PdfExporter {
 	private String exportFileName;
 	private static String templatePath = "templates";
 	private String templateFileName = "template-test.pdf";
+	private static String os =  System.getProperty("os.name").toLowerCase();
+	PrintService defaultPrintService = PrintServiceLookup.lookupDefaultPrintService();
 
 	private IndicoRegistrant registrant;
 
@@ -71,9 +73,11 @@ public class PdfExporter {
 	}
 
 	public void setFileNameFromRegistrantInforamtion() {
-		String fileName = registrant.getID() + "-" + registrant.getSurname()
+		if(registrant != null){
+			String fileName = registrant.getID() + "-" + registrant.getSurname()
 				+ "_" + registrant.getFirstName() + ".pdf";
-		setExportFileName(fileName);
+			setExportFileName(fileName);
+		}
 	}
 
 	public void setRegistrant(IndicoRegistrant registrant) {
@@ -83,6 +87,14 @@ public class PdfExporter {
 
 	public String getFullExportFileName() {
 		return exportPath + "/" + exportFileName;
+	}
+
+	public String getExportPath() {
+		return exportPath;
+	}
+
+	public String getExportFileName() {
+		return exportFileName;
 	}
 
 	public String getFullTemplateFileName() {
@@ -105,6 +117,12 @@ public class PdfExporter {
 	        
 		        for (PDField field : fields) {
 		            switch(field.getFullyQualifiedName()){
+		            case "Name":
+		            	 field.setValue(registrant.getFirstName() +" "+registrant.getSurname());
+		            	 break;
+		            case "Name1":
+		            	 field.setValue(registrant.getFirstName() +" "+registrant.getSurname());
+		            	 break;
 		            case "FirstName":
 		            	 field.setValue(registrant.getFirstName());
 		            	 break;
@@ -116,6 +134,9 @@ public class PdfExporter {
 		            	 break;
 		            case "ID":
 		            	 field.setValue(String.valueOf(registrant.getID()));
+		            	 break;
+		            case "Price":
+		            	 field.setValue(String.valueOf(registrant.getFullPrice()));
 		            	 break;
 		            }   
 		        }
@@ -171,21 +192,68 @@ public class PdfExporter {
 	}
 	
 	
+	public void printAll( IndicoEventRegistrantList registrants){
+		List<IndicoRegistrant> registrantsList = registrants.getRegistrantList();
+		IndicoRegistrant tmp_registrant = registrant;
+		for( IndicoRegistrant iRegistrant: registrantsList ){
+			if(iRegistrant != null){
+				setRegistrant(iRegistrant);
+				exportPdf();
+				printPdf();
+			}
+		}
+		setRegistrant(tmp_registrant);
+	}
+	
+	
 	public boolean printPdf(){
+		System.out.println("entering print fnc");
 		try {
-		 PrintService defaultPrintService = PrintServiceLookup.lookupDefaultPrintService();
 	      DocPrintJob printerJob = defaultPrintService.createPrintJob();
-	      File pdfFile = new File(getFullExportFileName());
-	      SimpleDoc simpleDoc= new SimpleDoc(pdfFile.toURI().toURL(), DocFlavor.URL.AUTOSENSE, null);
+			System.out.println("printJob created");
+	      SimpleDoc simpleDoc;
+	      //  File pdfFile = new File(getFullExportFileName());
+	    //  SimpleDoc simpleDoc= new SimpleDoc(pdfFile.toURI().toURL(), DocFlavor.URL.PDF, null);
+	      
+	      System.out.println(os);
+	      boolean linux =  (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") > 0 );
+	      if(linux){
+
+	    	  String psFilname = getFullExportFileName().replace(".pdf", ".ps");
+	    	  Runtime r = Runtime.getRuntime();
+
+	    	  System.out.println("creating ps");
+	    	  String[] commandArray = {"pdftops" , getFullExportFileName() , psFilname };
+	    	 // System.out.println("now executing " + command);
+	    	 Process p = r.exec(commandArray );
+	    	  // wait for ps to be created
+	    	 p.waitFor() ;
+		    	  System.out.println("ps created");
+	    	  InputStream stream =new FileInputStream(psFilname) ;
+		      simpleDoc= new SimpleDoc(stream, DocFlavor.INPUT_STREAM.POSTSCRIPT, null);
+	    	  
+	      }
+	      else{
+	    	  InputStream stream =new FileInputStream(getFullExportFileName()) ;
+		      simpleDoc= new SimpleDoc(stream, DocFlavor.INPUT_STREAM.PDF, null);
+	      }
+	      
+	      
+	      System.out.println("Now printing!");
 	      printerJob.print(simpleDoc, null);
 		} catch (PrintException e) {
 			System.out.println("Error while printing!");
 			e.printStackTrace();
 			return false;
-		}catch (MalformedURLException e) {
-			System.out.println("Error while printing!");
+		}catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return false;
+		}catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		return true;
