@@ -26,7 +26,12 @@ import indico.checkin.core.data.IndicoRegistrant;
 
 import java.awt.Desktop;
 import java.io.*;
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.print.DocFlavor;
 import javax.print.DocPrintJob;
@@ -50,7 +55,8 @@ public class PdfExporter {
 	private static String exportPath = System.getProperty("java.io.tmpdir");
 	private String exportFileName;
 	private static String templatePath = "templates";
-	private String templateFileName = "template-test.pdf";
+	private String templateFileName = "template-normal.pdf";
+	private String templateLongFileName = "template-long.pdf";
 	private static String os =  System.getProperty("os.name").toLowerCase();
 	PrintService defaultPrintService = PrintServiceLookup.lookupDefaultPrintService();
 
@@ -100,6 +106,9 @@ public class PdfExporter {
 	public String getFullTemplateFileName() {
 		return templatePath + "/" + templateFileName;
 	}
+	public String getFullTemplateLongFileName() {
+		return templatePath + "/" + templateLongFileName;
+	}
 	/*
 	 * 
 	 * 
@@ -107,9 +116,21 @@ public class PdfExporter {
 	 */
 	public boolean exportPdf() {
 		try {
-			PDDocument pdDoc = PDDocument.load(new File(getFullTemplateFileName()));
+			DecimalFormat f = new DecimalFormat("#0.00");
+			DateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy");
+			Date date = new Date();
+			String name = registrant.getFirstName() +" "+registrant.getSurname();
+			
+
+	        // test, which template to use
+			boolean longName = (registrant.getFirstName() +" "+registrant.getSurname()).length() > 18;
+			boolean longLongName = registrant.getFirstName().length() > 18;
+			String templateToUse = longName ? getFullTemplateLongFileName() : getFullTemplateFileName();
+			
+			PDDocument pdDoc = PDDocument.load(new File(templateToUse));
 	        PDDocumentCatalog pdCatalog = pdDoc.getDocumentCatalog();
 	        PDAcroForm acroForm = pdCatalog.getAcroForm();
+	        
 	        
 	        if( acroForm != null){
 	        	@SuppressWarnings("unchecked")
@@ -117,28 +138,68 @@ public class PdfExporter {
 	        
 		        for (PDField field : fields) {
 		            switch(field.getFullyQualifiedName()){
-		            case "Name":
-		            	 field.setValue(registrant.getFirstName() +" "+registrant.getSurname());
+		            case "FirstLastName1":
+		            case "FirstLastName2":
+		            case "FirstLastName3":
+		            case "FirstLastName4":
+		            case "FirstLastName5":
+		            case "FirstLastName6":
+		            	 field.setValue(name);
+		            	//field.setValue( registrant.getFullInformation().getFullName() );
 		            	 break;
-		            case "Name1":
-		            	 field.setValue(registrant.getFirstName() +" "+registrant.getSurname());
+		            	 /*
+		            case "FirstLastName6":
+		            	// check if companion
+		            	if( registrant.getAccompanyingPersons().equals("0") ) field.setValue("" );
+		            	else field.setValue(name);
 		            	 break;
-		            case "FirstName":
-		            	 field.setValue(registrant.getFirstName());
+		            case "FirstLastName4":
+		            	// check if companion
+		            	if( registrant.getExcursion().equals("No Excursion") ) field.setValue("" );
+		            	else field.setValue(name);
 		            	 break;
-		            case "Surname":
-		            	 field.setValue(registrant.getSurname());
+		            	 */
+		            case "#D":
+		            	int d = Integer.parseInt(registrant.getAccompanyingPersons()) + 1;
+		            	field.setValue( String.valueOf(d) );
+		            	 break;
+		            case "Companion":
+		            	if( registrant.getAccompanyingPersons().equals("0"))  field.setValue("No Companion" );
+		            	else  field.setValue("Companion" );
+		            	 break;
+		            case "Date":
+		            	 field.setValue(dateFormat.format(date));
+		            	 break;
+		            case "BadgeTag":
+		            	 field.setValue(registrant.getAffiliationForBadge());
 		            	 break;
 		            case "Institution":
 		            	 field.setValue(registrant.getInstitution());
 		            	 break;
-		            case "ID":
-		            	 field.setValue(String.valueOf(registrant.getID()));
+		            case "City":
+		            	 field.setValue(registrant.getCity());
 		            	 break;
-		            case "Price":
-		            	 field.setValue(String.valueOf(registrant.getFullPrice()));
+		            case "Country":
+		            	Locale country = new Locale("", registrant.getCountry());
+		            	 field.setValue( country.getDisplayCountry() );
+		            	 break;
+		            case "PostalCode":
+		            	 field.setValue(registrant.getPostalCode());
+		            	 break;
+		            case "Address":
+		            	 field.setValue(registrant.getAddress());
+		            	 break;
+		            case "Fee":
+		            	 field.setValue(String.valueOf(f.format(registrant.getFullInformation().getAmountPaid())) );
+		            	 break;
+		            case "Excursion":
+		            	 field.setValue(registrant.getExcursion());
+		            	 break;
+		            case "#E":
+		            	 field.setValue(registrant.getExcursionPersons() );
 		            	 break;
 		            }   
+		            
 		        }
 	        }
 	        pdDoc.save(getFullExportFileName());
@@ -192,14 +253,15 @@ public class PdfExporter {
 	}
 	
 	
-	public void printAll( IndicoEventRegistrantList registrants){
+	public void printAll( IndicoEventRegistrantList registrants, boolean print){
 		List<IndicoRegistrant> registrantsList = registrants.getRegistrantList();
 		IndicoRegistrant tmp_registrant = registrant;
 		for( IndicoRegistrant iRegistrant: registrantsList ){
 			if(iRegistrant != null){
 				setRegistrant(iRegistrant);
 				exportPdf();
-				printPdf();
+				if(print)
+					printPdf();
 			}
 		}
 		setRegistrant(tmp_registrant);

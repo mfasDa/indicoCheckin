@@ -18,6 +18,7 @@
 package indico.checkin.core.data;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -169,7 +170,32 @@ public class IndicoRegistrant {
 	public String getWebpage(){
 		return this.getPersonalInformation("address");
 	}
-	
+
+	public String getAffiliationForBadge(){
+		return this.getFullInformation().findGroupByTitle("Personal Data").findFieldByCaption("Affiliation for name tag").getValue();
+	}
+	public String getAddress(){
+		return this.getFullInformation().findGroupByTitle("Personal Data").findFieldByCaption("Postal address").getValue();
+	}
+
+	public String getPostalCode(){
+		return this.getFullInformation().findGroupByTitle("Personal Data").findFieldByCaption("ZIP code").getValue();
+	}
+	public String getAccompanyingPersons(){
+		return this.getFullInformation().findGroupByTitle("Lunch and conference dinner options").findFieldByCaption("Accompanying person conference dinner").getValue();
+	}
+	public String getExcursion(){
+		List<IndicoRegistrantSocialEvent> socialEvents = this.getFullInformation().getSocialEvents();
+		if(socialEvents.isEmpty()) return "No Excursion";
+		String socialEvent = socialEvents.get(0).getCaption();
+		return socialEvent;
+	}
+	public String getExcursionPersons(){
+		List<IndicoRegistrantSocialEvent> socialEvents = this.getFullInformation().getSocialEvents();
+		if(socialEvents.isEmpty()) return "0";
+		String number = String.valueOf(socialEvents.get(0).getNumberPlaces());
+		return number;
+	}
 	public boolean hasPaid(){
 		/*
 		 * check whether registrant has already payed

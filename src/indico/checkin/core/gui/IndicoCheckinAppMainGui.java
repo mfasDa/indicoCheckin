@@ -382,12 +382,17 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 	 * Handle click to newUserButton
 	 */
 	public void newUserClicked(){
-		this.newUserButton.setEnabled(false);
-		this.changePaymentButton.setEnabled(false);
-		eticket = null;
-		current = null;
-		newregthread = new Thread(new Webcamcatcher(this));
-		newregthread.start();
+		try{
+			this.newUserButton.setEnabled(false);
+			this.changePaymentButton.setEnabled(false);
+			eticket = null;
+			current = null;
+			newregthread = new Thread(new Webcamcatcher(this));
+			newregthread.start();
+		}
+		catch(Exception e){
+			JOptionPane.showMessageDialog(this, "Error while scanning code.");
+		}
 	}
 	
 	/**
@@ -468,7 +473,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 				System.out.printf("Fetch full information for registrant %d\n", eticket.getRegistrantID());
 				try{
 					this.indicoConnection.fetchFullRegistrantInformation(current);
-					if(current.hasPaid()){
+					if( current.hasPaid()){
 						// if the registrant has already payed, checkin and generate ticket
 						// in case the user has checked in, rename the button as Print ticket
 						// TODO: remove printout when debugging finished
@@ -476,7 +481,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 						if(!current.hasCheckedIn()){
 							// checkin the user
 							beep(1);
-							doCheckinAndTicket();
+							doCheckin();
 						} else {
 							// User checked in - generate ticket
 							beep(3);
@@ -492,36 +497,62 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 						this.changePaymentButton.setEnabled(true);
 					}
 					this.infopanel.UpdateRegistrantData(current);
-				} catch (RegistrantBuilderException e){
+				} catch (Exception e){
 					// Failed reading registrant
-					beep(3);
+					JOptionPane.showMessageDialog(this, "Invalid information");
+					beep(4);
 				}
 			} else {
 				// ETicket read successfully, but registrant not found
 				JOptionPane.showMessageDialog(this, "Invalid information");
-				beep(3);
+				beep(4);
 			}
 		} else {
 			// invalid e-ticket
 			JOptionPane.showMessageDialog(this, "Invalid information");
-			beep(3);
+			beep(4);
 		}
 	}
 	
 	/**
 	 * Checkin
 	 */
-	public void doCheckinAndTicket(){
+	public void doCheckin(){
 		try {
+			System.out.println("trying to checkin");
 			boolean status = indicoConnection.pushCheckin(current);
 			if(status){
+				System.out.println("checked in successfully");
+				// checkin successfull
+				infopanel.UpdateRegistrantDisplay();
+			} else {
+				System.out.println("checkin failed");
+				beep(3);
+			}
+		} catch (IndicoPostException e) {
+			System.out.println("exception during checkin");
+			beep(3);
+		}
+	}
+	
+	/**
+	 * Checkin and ticket generation
+	 */
+	public void doCheckinAndTicket(){
+		try {
+			System.out.println("trying to checkin");
+			boolean status = true;//indicoConnection.pushCheckin(current);
+			if(status){
+				System.out.println("checked in successfully");
 				// checkin successfull
 				infopanel.UpdateRegistrantDisplay();
 				handleGenerateTicket();
 			} else {
+				System.out.println("checkin failed");
 				beep(3);
 			}
-		} catch (IndicoPostException e) {
+		} catch (Exception e) {
+			System.out.println("exception during checkin");
 			beep(3);
 		}
 	}
@@ -556,9 +587,14 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 	public void handleGenerateTicket(){
 		pdfExporter.setRegistrant(current);
 		if( pdfExporter.exportPdf()){
-			if( !pdfExporter.printPdf()){
+		//	if( !pdfExporter.printPdf()){
 				pdfExporter.openPdf();
-			}
+		//	}
+		}
+		else{
+			
+
+			JOptionPane.showMessageDialog(this, "Generation of ticket failed!");
 		}
 		
 	}
@@ -568,7 +604,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 	 * generate and print pdfs for all registrants
 	 */
 	public void handlePrintAll(){
-		pdfExporter.printAll(registrants);
+		pdfExporter.printAll(registrants, false);
 		
 	}
 	
