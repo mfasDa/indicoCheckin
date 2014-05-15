@@ -172,29 +172,46 @@ public class IndicoRegistrant {
 	}
 
 	public String getAffiliationForBadge(){
-		return this.getFullInformation().findGroupByTitle("Personal Data").findFieldByCaption("Affiliation for name tag").getValue();
+		if(fullInformation == null)
+			return "";
+		return fullInformation.findGroupByTitle("Personal Data").findFieldByCaption("Affiliation for name tag").getValue();
+		
 	}
 	public String getAddress(){
-		return this.getFullInformation().findGroupByTitle("Personal Data").findFieldByCaption("Postal address").getValue();
+		if(fullInformation == null)
+			return "";
+		return fullInformation.findGroupByTitle("Personal Data").findFieldByCaption("Postal address").getValue();
 	}
 
 	public String getPostalCode(){
-		return this.getFullInformation().findGroupByTitle("Personal Data").findFieldByCaption("ZIP code").getValue();
+		if(fullInformation == null)
+			return "";
+		return fullInformation.findGroupByTitle("Personal Data").findFieldByCaption("ZIP code").getValue();
+		
 	}
 	public String getAccompanyingPersons(){
-		return this.getFullInformation().findGroupByTitle("Lunch and conference dinner options").findFieldByCaption("Accompanying person conference dinner").getValue();
+		if(fullInformation == null)
+			return "0";
+		return fullInformation.findGroupByTitle("Lunch and conference dinner options").findFieldByCaption("Accompanying person conference dinner").getValue();
 	}
+	
+	
 	public String getExcursion(){
-		List<IndicoRegistrantSocialEvent> socialEvents = this.getFullInformation().getSocialEvents();
-		if(socialEvents.isEmpty()) return "No Excursion";
-		String socialEvent = socialEvents.get(0).getCaption();
-		return socialEvent;
+		if(fullInformation == null)
+			return "";
+			List<IndicoRegistrantSocialEvent> socialEvents = fullInformation.getSocialEvents();
+			if(socialEvents.isEmpty()) return "No Excursion";
+			String socialEvent = socialEvents.get(0).getCaption();
+			return socialEvent;
+		
 	}
 	public String getExcursionPersons(){
-		List<IndicoRegistrantSocialEvent> socialEvents = this.getFullInformation().getSocialEvents();
-		if(socialEvents.isEmpty()) return "0";
-		String number = String.valueOf(socialEvents.get(0).getNumberPlaces());
-		return number;
+		if(fullInformation == null)
+			return "";
+			List<IndicoRegistrantSocialEvent> socialEvents = fullInformation.getSocialEvents();
+			if(socialEvents.isEmpty()) return "0";
+			String number = String.valueOf(socialEvents.get(0).getNumberPlaces());
+			return number;
 	}
 	public boolean hasPaid(){
 		/*
@@ -225,4 +242,17 @@ public class IndicoRegistrant {
 		if(fullInformation != null) return fullInformation.getFullPrice();
 		return 0.;
 	}
-}
+
+	public double getFee(){
+		try{
+			return getFullInformation().getAmountPaid();
+		}
+		catch(Exception e){
+			return 0.;
+		}
+	}
+	}
+
+
+
+
