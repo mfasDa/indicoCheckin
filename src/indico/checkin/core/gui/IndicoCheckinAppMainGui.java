@@ -100,6 +100,8 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		indicoConnection = new IndicoAPIConnector();
 		newregthread = null;
 		
+		pdfExporter.setReplace(false);
+		
 		isLoggedIn = false;
 		hasWebcam = Webcam.getWebcams().size() > 0;
 		if(!hasWebcam){
@@ -439,12 +441,12 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 						// TODO: remove printout when debugging finished
 						System.out.println("Registrant has already paid");
 						if(!current.hasCheckedIn()){
-							doCheckinAndTicket();
+							doCheckin();
 							beep(1);
 						} else
 							beep(3);
 						this.changePaymentButton.setEnabled(true);
-						this.changePaymentButton.setText("Print ticket");
+						this.changePaymentButton.setText("Open ticket");
 					} else {
 						// Only enable button that the changes payment
 						// TODO: remove printout when debugging finished
@@ -475,7 +477,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 					this.indicoConnection.fetchFullRegistrantInformation(current);
 					if( current.hasPaid()){
 						// if the registrant has already payed, checkin and generate ticket
-						// in case the user has checked in, rename the button as Print ticket
+						// in case the user has checked in, rename the button as Open ticket
 						// TODO: remove printout when debugging finished
 						System.out.println("Registrant has already paid");
 						if(!current.hasCheckedIn()){
@@ -485,7 +487,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 						} else {
 							// User checked in - generate ticket
 							beep(3);
-							changePaymentButton.setText("Print ticket");
+							changePaymentButton.setText("Open ticket");
 							this.changePaymentButton.setEnabled(true);
 						}
 					} else {
@@ -520,7 +522,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 	public void doCheckin(){
 		try {
 			System.out.println("trying to checkin");
-			boolean status = indicoConnection.pushCheckin(current);
+			boolean status = true ;//indicoConnection.pushCheckin(current);
 			if(status){
 				System.out.println("checked in successfully");
 				// checkin successfull
@@ -529,7 +531,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 				System.out.println("checkin failed");
 				beep(3);
 			}
-		} catch (IndicoPostException e) {
+		} catch (Exception e) {
 			System.out.println("exception during checkin");
 			beep(3);
 		}
@@ -604,7 +606,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 	 * generate and print pdfs for all registrants
 	 */
 	public void handlePrintAll(){
-		pdfExporter.printAll(registrants, false);
+		pdfExporter.printAll(registrants, this.indicoConnection, false, true);
 		
 	}
 	
