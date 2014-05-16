@@ -31,6 +31,7 @@ import java.io.*;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -418,7 +419,8 @@ public class PdfExporter {
 		try {
 			
 			List<IndicoRegistrant> registrantsList = registrants.getRegistrantList();
-			registrantsList.sort( new IndicoRegistrantComparator() );
+			//registrantsList.sort( new IndicoRegistrantComparator() );
+			Collections.sort(registrantsList, new IndicoRegistrantComparator());
 			IndicoRegistrant tmp_registrant = registrant;
 
 			PDFMergerUtility globalmerger = new PDFMergerUtility();
