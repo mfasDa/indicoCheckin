@@ -53,7 +53,7 @@ public class RegistrantInfoDisplayModel extends AbstractTableModel {
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		String rowTitles[] = {"Last Name:", "First Name:", "Registrant ID:", "Paid:", "Checked in:", "Price:", "Amount Paid:", "Places for conference dinner;", "Places in social events:"};
+		String rowTitles[] = {"Last Name:", "First Name:", "Registrant ID:", "Paid:", "Checked in:", "Price:", "Amount Paid:", "Places for conference dinner:", "Places in social events:"};
 		if(columnIndex == 0){
 			return rowTitles[rowIndex];
 		} else {
