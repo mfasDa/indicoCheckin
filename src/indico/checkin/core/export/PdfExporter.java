@@ -142,13 +142,23 @@ public class PdfExporter {
 	 */
 	public boolean exportPdf() {
 		try {
+			// only print people that have paid
+			
+			if( !registrant.hasPaid()){
+				System.out.println("registrant has not paid yet!");
+				return false;
+				
+			}
+			
+			
+			
 			DecimalFormat f = new DecimalFormat("#0.00");
 			DateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy");
 			Date date = new Date();
 			String address = replaceSpecialCharacters ? 
 					replaceSpecialCharacters(registrant.getAddress())
 					: registrant.getAddress();
-			
+
 			
 			
 			String firstname = replaceSpecialCharacters ? 
@@ -166,7 +176,9 @@ public class PdfExporter {
 
 			
 			//create only long names
-			//if((registrant.getFirstName() +" "+registrant.getSurname()).length() < 21) return false;				
+			//if((registrant.getFirstName() +" "+registrant.getSurname()).length() < 21) return false;	
+			//if(address.length() < 60) return false;	
+						
 			
 			
 				// normal name			
@@ -220,7 +232,6 @@ public class PdfExporter {
 			String city = replaceSpecialCharacters ? 
 							replaceSpecialCharacters(registrant.getCity())
 							: registrant.getCity();
-			
 			PDDocument pdDoc = PDDocument.load(new File(getFullTemplateFileName()));
 	        PDDocumentCatalog pdCatalog = pdDoc.getDocumentCatalog();
 	        PDAcroForm acroForm = pdCatalog.getAcroForm();
@@ -245,7 +256,7 @@ public class PdfExporter {
 		            case "FirstLastName5":
 		            case "FirstLastName6":
 		            	if(field.getFullyQualifiedName().equals("FirstLastName6") && registrant.getAccompanyingPersons().equals("0")){
-		            		field.setValue("No Companion");
+		            		field.setValue("");
 		            	}
 			            else{
 			            	field.setValue(firstlastname);
@@ -330,13 +341,13 @@ public class PdfExporter {
 		            	 field.setValue(address);
 		            	 break;
 		            case "Fee":
-		            	 field.setValue(field.getValue().replaceAll("XXX", String.valueOf(f.format(registrant.getFee()))) );
+		            	 field.setValue(field.getValue().replaceAll("XXX", String.valueOf(f.format(registrant.getConferenceFee()))) );
 		            	 break;
 		            case "ExcursionType":
 		            	 field.setValue(registrant.getExcursion());
 		            	 break;
 		            case "ExcursionNumber":
-		            	 field.setValue(    field.getValue().replaceAll("X", registrant.getExcursionPersons())    );
+		            	 field.setValue(    field.getValue().replaceAll("X",  String.valueOf( registrant.getExcursionPersons() ) )    );
 		            	 break;
 		            }   
 		            
@@ -405,9 +416,6 @@ public class PdfExporter {
 	
 	public void printAll( IndicoEventRegistrantList registrants, IndicoAPIConnector connection, boolean print, boolean merge){
 		try {
-			if(!printerIsSetup){
-				setupPrinter();
-			}
 			
 			List<IndicoRegistrant> registrantsList = registrants.getRegistrantList();
 			registrantsList.sort( new IndicoRegistrantComparator() );
@@ -418,12 +426,13 @@ public class PdfExporter {
 			int n = 0;
 			for( IndicoRegistrant iRegistrant: registrantsList ){
 				if(iRegistrant != null ){
-					n++;
 					System.out.println(n);
 					setRegistrant(iRegistrant);
 					connection.fetchFullRegistrantInformation(iRegistrant);
 					
 					boolean exported = exportPdf();
+					if(exported)
+						n++;
 					if(print){
 						printPdf();
 					}
@@ -450,15 +459,17 @@ public class PdfExporter {
 			setRegistrant(tmp_registrant);
 		}
 		catch (Exception e) {
-			System.out.println("Exception mergin files.");
+			System.out.println("Exception merging files.");
 			System.out.println(e.getStackTrace());
 		}
 	}
 	
 	
 	public boolean printPdf(){
-		System.out.println("entering print fnc");
 		try {
+			if(!printerIsSetup){
+				setupPrinter();
+			}
 	      DocPrintJob printerJob = defaultPrintService.createPrintJob();
 			System.out.println("printJob created");
 	      SimpleDoc simpleDoc;

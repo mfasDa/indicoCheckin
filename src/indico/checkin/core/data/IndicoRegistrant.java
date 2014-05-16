@@ -17,6 +17,7 @@
  ****************************************************************************/
 package indico.checkin.core.data;
 
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -199,19 +200,25 @@ public class IndicoRegistrant {
 	public String getExcursion(){
 		if(fullInformation == null)
 			return "";
-			List<IndicoRegistrantSocialEvent> socialEvents = fullInformation.getSocialEvents();
-			if(socialEvents.isEmpty()) return "No Excursion";
-			String socialEvent = socialEvents.get(0).getCaption();
-			return socialEvent;
+
+		DecimalFormat f = new DecimalFormat("#0.00");
+		List<IndicoRegistrantSocialEvent> socialEvents = fullInformation.getSocialEvents();
+		if(socialEvents.isEmpty()) return "No Excursion";
+		String socialEvent = socialEvents.get(0).getCaption();
+		if(socialEvent.equals("Mathildenhöhe")) return "Mathildenhöhe (museum or tower)";
+		else{
+			double price = socialEvents.get(0).getPrice() * getExcursionPersons();
+			return socialEvent + " (" + f.format(price) +" €)";
+		}
 		
 	}
-	public String getExcursionPersons(){
+	public long getExcursionPersons(){
 		if(fullInformation == null)
-			return "";
-			List<IndicoRegistrantSocialEvent> socialEvents = fullInformation.getSocialEvents();
-			if(socialEvents.isEmpty()) return "0";
-			String number = String.valueOf(socialEvents.get(0).getNumberPlaces());
-			return number;
+			return 0;
+		List<IndicoRegistrantSocialEvent> socialEvents = fullInformation.getSocialEvents();
+		if(socialEvents.isEmpty()) return 0;
+		long number = socialEvents.get(0).getNumberPlaces();
+		return number;
 	}
 	public boolean hasPaid(){
 		/*
@@ -244,15 +251,21 @@ public class IndicoRegistrant {
 	}
 
 	public double getFee(){
-		try{
-			return getFullInformation().getAmountPaid();
-		}
-		catch(Exception e){
-			return 0.;
-		}
-	}
+		if(fullInformation != null) return fullInformation.getAmountPaid();
+		return 0.;
 	}
 
+	/*
+	 * calculate fee for badge out of information from database
+	 */
+	
+	public double getConferenceFee(){
+		if(fullInformation != null){
+			return fullInformation.findGroupByTitle("Conference Fee").findFieldByCaption("Conference Fee:").getPrice();
+		}
+		return 0.;
+	}
 
+}
 
 
