@@ -53,7 +53,7 @@ public class RegistrantInfoDisplayModel extends AbstractTableModel {
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		String rowTitles[] = {"Last Name:", "First Name:", "Registrant ID:", "Paid:", "Checked in:", "Price:", "Amount Paid:", "Places for conference dinner;", "Places in social events:"};
+		String rowTitles[] = {"Last Name:", "First Name:", "Registrant ID:", "Paid:", "Checked in:", "Price:", "Amount Paid:", "Places for conference dinner:", "Places in social events:"};
 		if(columnIndex == 0){
 			return rowTitles[rowIndex];
 		} else {
@@ -79,7 +79,9 @@ public class RegistrantInfoDisplayModel extends AbstractTableModel {
 					entry = String.format("EUR %.2f", registrant.getFullPrice());
 					break;
 				case 6:
-					entry = String.format("EUR %.2f", registrant.getFullInformation().getAmountPaid());
+					// field wrongly set!!!
+					//entry = String.format("EUR %.2f", registrant.getFullInformation().getAmountPaid());
+					entry = "EUR " + registrant.getAmountPaid();
 					break;
 				case 7:
 					// This is a special field for the quark matter conference (up to now)
