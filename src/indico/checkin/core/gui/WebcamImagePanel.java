@@ -17,6 +17,7 @@
  ****************************************************************************/
 package indico.checkin.core.gui;
 
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
@@ -42,15 +43,16 @@ public class WebcamImagePanel extends JPanel {
 	
 	public WebcamImagePanel(){
 		webcam = null;
+		this.setPreferredSize(new Dimension(640,480));
 	}
 	
 	public WebcamImagePanel(Webcam wc){
 		webcam = wc;
 		this.setPreferredSize(webcam.getViewSize());
 	}
-	
 	public void SetWebcam(Webcam webcam){
 		boolean wasWebcamOpen = false;
+		webcam.setViewSize(new Dimension(640,480));
 		if(this.webcam.isOpen()){
 			this.webcam.close();
 			wasWebcamOpen = true;
@@ -59,6 +61,7 @@ public class WebcamImagePanel extends JPanel {
 		// Open new webcam if needed
 		if(wasWebcamOpen) 
 			this.webcam.open();
+
 	}
 	
 	public Webcam getWebcam(){

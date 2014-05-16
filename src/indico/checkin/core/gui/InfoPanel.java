@@ -20,6 +20,7 @@ package indico.checkin.core.gui;
 import indico.checkin.core.data.IndicoRegistrant;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.util.List;
 
@@ -57,18 +58,18 @@ public class InfoPanel extends JPanel implements ListSelectionListener{
 		this.parentFrame = parentFrame;
 
 		webcampanel = new WebcamImagePanel(Webcam.getDefault());
-		//webcampanel.setPreferredSize(new Dimension(600, 400));
+		webcampanel.setPreferredSize(new Dimension(640, 480));
 		this.add(webcampanel, BorderLayout.WEST);
 		
 		tablemodel = new RegistrantInfoDisplayModel();
 		userdata = new JTable(tablemodel);
 		userdata.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		userdata.getColumnModel().getColumn(0).setPreferredWidth(275);
-		userdata.getColumnModel().getColumn(1).setPreferredWidth(350);	
-		userdata.setRowHeight(22);
+		userdata.getColumnModel().getColumn(0).setPreferredWidth(400);
+		userdata.getColumnModel().getColumn(1).setPreferredWidth(400);	
+		userdata.setRowHeight(36);
 		userdata.setDefaultRenderer(Object.class, new RegistrantInfoRenderer());
 		userdata.getSelectionModel().addListSelectionListener(this);
-		userdata.setFont(new Font("Arial", Font.PLAIN, 20));
+		userdata.setFont(new Font("Arial", Font.PLAIN, 30));
 		this.add(userdata, BorderLayout.EAST);
 	}
 	
