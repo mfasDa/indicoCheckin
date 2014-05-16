@@ -150,8 +150,6 @@ public class PdfExporter {
 				
 			}
 			
-			
-			
 			DecimalFormat f = new DecimalFormat("#0.00");
 			DateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy");
 			Date date = new Date();
@@ -296,8 +294,8 @@ public class PdfExporter {
 		            	else  field.setValue("Companion" );
 		            	 break;
 		            case "Date":
-		            	// field.setValue(dateFormat.format(date));
-		            	 field.setValue("May 18, 2014");
+		            	 field.setValue(dateFormat.format(date));
+		            	// field.setValue("May 18, 2014");
 		            	 break;
 		            case "BadgeTag1":
 		            	field.setValue(badgeTag);
