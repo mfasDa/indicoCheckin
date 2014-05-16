@@ -26,10 +26,12 @@ import indico.checkin.core.gui.IndicoCheckinAppMainGui;
  */
 public class IndicoCheckinApp {
 	
-
 	public static void main(String[] args) {
+		
+		boolean paymentOptions = false;
+		
 		// Run the gui
-		new IndicoCheckinAppMainGui();
+		new IndicoCheckinAppMainGui(paymentOptions);
 	}
 
 }

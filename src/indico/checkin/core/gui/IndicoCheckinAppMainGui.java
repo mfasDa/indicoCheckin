@@ -73,6 +73,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 	
 	private boolean isLoggedIn;
 	private boolean hasWebcam;
+	private boolean paymentOptions;
 	
 	// connection to indico server
 	private IndicoAPIConnector indicoConnection;
@@ -84,7 +85,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 	/**
 	 * Default constructor: Create the gui and show it
 	 */
-	public IndicoCheckinAppMainGui(){
+	public IndicoCheckinAppMainGui(boolean paymentOptions){
 		
 		try {
 			// Set the look and feel to the system look and feel
@@ -99,6 +100,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		current = null;
 		indicoConnection = new IndicoAPIConnector();
 		newregthread = null;
+		this.paymentOptions = paymentOptions;
 		
 		pdfExporter.setReplace(false);
 		
@@ -363,7 +365,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 						String.format("No registrants for event %s", 
 								this.indicoConnection.getEventID()));
 			}
-			this.printAllButton.setEnabled(true);
+			//this.printAllButton.setEnabled(true);
 			this.infopanel.openWebcam();
 		}
 
@@ -445,7 +447,10 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 							beep(1);
 						} else
 							beep(3);
-						this.changePaymentButton.setEnabled(true);
+						// only enable payment button, if app has enabled payment options
+						
+						if(paymentOptions)
+							this.changePaymentButton.setEnabled(true);
 						this.changePaymentButton.setText("Open ticket");
 					} else {
 						// Only enable button that the changes payment
