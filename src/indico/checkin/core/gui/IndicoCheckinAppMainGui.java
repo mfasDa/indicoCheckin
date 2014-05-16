@@ -456,6 +456,8 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 						} else{
 							doCheckin();
 							beep(1);
+							this.changePaymentButton.setEnabled(true);
+							this.changePaymentButton.setText("Open ticket");
 						}
 					} else {
 						// Only enable button that the changes payment
@@ -503,6 +505,8 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 							// checkin the user
 							beep(1);
 							doCheckin();
+							changePaymentButton.setText("Open ticket");
+							this.changePaymentButton.setEnabled(true);
 						}
 					} else {
 						// Only enable button that the changes payment
@@ -518,16 +522,16 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 				} catch (Exception e){
 					// Failed reading registrant
 					JOptionPane.showMessageDialog(this, "Invalid information");
-					beep(4);
+					beep(3);
 				}
 			} else {
 				// ETicket read successfully, but registrant not found
-				beep(4);
+				beep(3);
 				JOptionPane.showMessageDialog(this, "Invalid information");
 			}
 		} else {
 			// invalid e-ticket
-			beep(4);
+			beep(3);
 			JOptionPane.showMessageDialog(this, "Invalid information");
 		}
 	}
@@ -545,10 +549,12 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 				infopanel.UpdateRegistrantDisplay();
 			} else {
 				System.out.println("checkin failed");
+				JOptionPane.showMessageDialog(this, "checkin failed");
 				beep(3);
 			}
 		} catch (Exception e) {
 			System.out.println("exception during checkin");
+			JOptionPane.showMessageDialog(this, "checkin failed");
 			beep(3);
 		}
 	}
@@ -567,10 +573,12 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 				handleGenerateTicket();
 			} else {
 				System.out.println("checkin failed");
+				JOptionPane.showMessageDialog(this, "checkin failed");
 				beep(3);
 			}
 		} catch (Exception e) {
 			System.out.println("exception during checkin");
+			JOptionPane.showMessageDialog(this, "checkin failed");
 			beep(3);
 		}
 	}
