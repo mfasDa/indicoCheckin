@@ -95,7 +95,7 @@ public class OAuthVerifyCatcher implements Runnable{
 					if(line.contains("GET")){
 						// read the verifier token
 						Map<String,String> params = ExtractGetParamters(line);
-						sendResponse(writer, "<html><head><title>Finished</title></head><body><h1>Authentification successfull!</h1><p>Please go back to the indico checkin application.</p></body></html>");
+						sendResponse(writer, "<html><head><title>Finished</title></head><body><h1>Authentication successful!</h1><p>Please go back to the indico checkin application.</p></body></html>");
 						String myVerifier = null;
 						if((myVerifier = params.get("oauth_verifier")) != null){
 							verifier = myVerifier;

@@ -15,23 +15,21 @@
  *  You should have received a copy of the GNU General Public License       *
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  ****************************************************************************/
-package indico.checkin.core;
 
-import indico.checkin.core.gui.IndicoCheckinAppMainGui;
+
+package indico.checkin.core.data;
+
+import java.util.Comparator;
 
 /**
- * The main program: starts the gui
+ * Compare registrants based on their surname
  * 
- * @author: Markus Fasel
+ * @author; Steffen Weber
  */
-public class IndicoCheckinApp {
-	
-	public static void main(String[] args) {
-		
-		boolean paymentOptions = false;
-		
-		// Run the gui
-		new IndicoCheckinAppMainGui(paymentOptions);
-	}
+public class IndicoRegistrantComparator  implements Comparator<IndicoRegistrant>{
 
+	@Override
+	public int compare(IndicoRegistrant o1, IndicoRegistrant o2) {
+		return o1.getSurname().toLowerCase().compareTo(o2.getSurname().toLowerCase());
+	}
 }

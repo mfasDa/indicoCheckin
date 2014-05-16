@@ -25,6 +25,8 @@ import java.awt.image.BufferedImage;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.swing.JOptionPane;
+
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.LuminanceSource;
 import com.google.zxing.MultiFormatReader;
@@ -74,7 +76,14 @@ public class WebcamProcessor extends TimerTask {
 		if(ticket == null){
 			String ticketString = ProcessImage(webcampanel.getImage());
 			if(ticketString.length() > 0){
-				ticket = decodeTicket(ticketString);
+				try {
+					ticket = decodeTicket(ticketString);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					System.out.println("Error decoding ticket.");
+					parent.cancel();
+					catcher.timerReturn(ticket);
+				}
 			}
 		} else {
 			// Ticket was already read in successfully, terminate timer
@@ -106,23 +115,21 @@ public class WebcamProcessor extends TimerTask {
 			MultiFormatReader reader = new MultiFormatReader();
 			Result res = reader.decode(bmp);
 			barcode = res.getText(); 
-		} catch (NotFoundException e){
+		} catch (Exception e){
 			barcode = "";
 		}
 		return barcode;
 	}
 	
-	private IndicoParsedETicket decodeTicket(String ticketString){
+	private IndicoParsedETicket decodeTicket(String ticketString) throws Exception{
 		/*
 		 * Convert the ticket string to a parsed eticket
 		 */
 		IndicoParsedETicket eticket = null;
 		IndicoJSONBarcodeParser parser = new IndicoJSONBarcodeParser();
-		try{
-			eticket = parser.parse(ticketString);
-		} catch (ETicketDecodingException e){
-			e.printStackTrace();
-		}
+		
+		eticket = parser.parse(ticketString);
+		 
 		return eticket;
 	}
 

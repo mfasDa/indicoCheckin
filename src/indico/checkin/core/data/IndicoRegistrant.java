@@ -17,7 +17,9 @@
  ****************************************************************************/
 package indico.checkin.core.data;
 
+import java.text.DecimalFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -169,7 +171,55 @@ public class IndicoRegistrant {
 	public String getWebpage(){
 		return this.getPersonalInformation("address");
 	}
+
+	public String getAffiliationForBadge(){
+		if(fullInformation == null)
+			return "";
+		return fullInformation.findGroupByTitle("Personal Data").findFieldByCaption("Affiliation for name tag").getValue();
+		
+	}
+	public String getAddress(){
+		if(fullInformation == null)
+			return "";
+		return fullInformation.findGroupByTitle("Personal Data").findFieldByCaption("Postal address").getValue();
+	}
+
+	public String getPostalCode(){
+		if(fullInformation == null)
+			return "";
+		return fullInformation.findGroupByTitle("Personal Data").findFieldByCaption("ZIP code").getValue();
+		
+	}
+	public String getAccompanyingPersons(){
+		if(fullInformation == null)
+			return "0";
+		return fullInformation.findGroupByTitle("Lunch and conference dinner options").findFieldByCaption("Accompanying person conference dinner").getValue();
+	}
 	
+	
+	public String getExcursion(){
+		if(fullInformation == null)
+			return "";
+
+		DecimalFormat f = new DecimalFormat("#0.00");
+		List<IndicoRegistrantSocialEvent> socialEvents = fullInformation.getSocialEvents();
+		if(socialEvents.isEmpty()) return "No Excursion";
+		String socialEvent = socialEvents.get(0).getCaption();
+		if(socialEvent.equals("Mathildenhöhe")) return "Mathildenhöhe (museum or tower)";
+		else{
+			double price = socialEvents.get(0).getPrice() * getExcursionPersons();
+			return socialEvent + " (" + f.format(price) +" €)";
+		}
+		
+	}
+	public long getExcursionPersons(){
+		if(fullInformation == null)
+			return 0;
+		List<IndicoRegistrantSocialEvent> socialEvents = fullInformation.getSocialEvents();
+		if(socialEvents.isEmpty()) return 0;
+		long number = socialEvents.get(0).getNumberPlaces();
+		return number;
+	}
 	public boolean hasPaid(){
 		/*
 		 * check whether registrant has already payed
@@ -199,4 +249,23 @@ public class IndicoRegistrant {
 		if(fullInformation != null) return fullInformation.getFullPrice();
 		return 0.;
 	}
+
+	public double getFee(){
+		if(fullInformation != null) return fullInformation.getAmountPaid();
+		return 0.;
+	}
+
+	/*
+	 * calculate fee for badge out of information from database
+	 */
+	
+	public double getConferenceFee(){
+		if(fullInformation != null){
+			return fullInformation.findGroupByTitle("Conference Fee").findFieldByCaption("Conference Fee:").getPrice();
+		}
+		return 0.;
+	}
+
 }
+
+

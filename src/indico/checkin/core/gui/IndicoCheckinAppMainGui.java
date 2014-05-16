@@ -59,6 +59,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 	private JButton changePaymentButton;
 	private JButton cancelButton;
 	private JButton manualSearchButton;
+	private JButton printAllButton;
 	
 	private InfoPanel infopanel;
 	
@@ -73,6 +74,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 	
 	private boolean isLoggedIn;
 	private boolean hasWebcam;
+	private boolean paymentOptions;
 	
 	// connection to indico server
 	private IndicoAPIConnector indicoConnection;
@@ -84,7 +86,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 	/**
 	 * Default constructor: Create the gui and show it
 	 */
-	public IndicoCheckinAppMainGui(){
+	public IndicoCheckinAppMainGui(boolean paymentOptions){
 		
 		try {
 			// Set the look and feel to the system look and feel
@@ -99,6 +101,9 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		current = null;
 		indicoConnection = new IndicoAPIConnector();
 		newregthread = null;
+		this.paymentOptions = paymentOptions;
+		
+		pdfExporter.setReplace(false);
 		
 		isLoggedIn = false;
 		hasWebcam = Webcam.getWebcams().size() > 0;
@@ -132,15 +137,27 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		lbcs.gridy = 0;
 		userButtonPanel.add(this.loginbutton, lbcs);
 		
+		
 		this.apiinfobutton = new JButton("API Info");
 		this.apiinfobutton.setActionCommand("apiinfo");
 		this.apiinfobutton.addActionListener(this);
 		this.apiinfobutton.setEnabled(false);
+		//GridBagConstraints abcs = new GridBagConstraints();
+		//abcs.fill = GridBagConstraints.HORIZONTAL;
+		//abcs.gridx = 1;
+		//abcs.gridy = 0;
+		//userButtonPanel.add(this.apiinfobutton, abcs);
+		
+		
+		this.printAllButton = new JButton("print all");
+		this.printAllButton.setActionCommand("printAll");
+		this.printAllButton.addActionListener(this);
+		this.printAllButton.setEnabled(false);
 		GridBagConstraints abcs = new GridBagConstraints();
 		abcs.fill = GridBagConstraints.HORIZONTAL;
 		abcs.gridx = 1;
 		abcs.gridy = 0;
-		userButtonPanel.add(this.apiinfobutton, abcs);
+		userButtonPanel.add(this.printAllButton, abcs);
 		
 		JButton searchWebcamButton = new JButton("Select Webcam");
 		searchWebcamButton.setActionCommand("searchWebcam");
@@ -226,6 +243,8 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 			handleLogin();
 		} else if(arg0.getActionCommand().equals("apiinfo")){
 			showApiInfoDialog();
+		} else if(arg0.getActionCommand().equals("printAll")){
+			handlePrintAll();
 		} else if(arg0.getActionCommand().equals("exit")){
 			handleExit();
 		}else if(arg0.getActionCommand().equals("newUser")){
@@ -348,7 +367,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 						String.format("No registrants for event %s", 
 								this.indicoConnection.getEventID()));
 			}
-			this.apiinfobutton.setEnabled(true);
+			//this.printAllButton.setEnabled(true);
 			this.infopanel.openWebcam();
 		}
 
@@ -369,12 +388,17 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 	 * Handle click to newUserButton
 	 */
 	public void newUserClicked(){
-		this.newUserButton.setEnabled(false);
-		this.changePaymentButton.setEnabled(false);
-		eticket = null;
-		current = null;
-		newregthread = new Thread(new Webcamcatcher(this));
-		newregthread.start();
+		try{
+			this.newUserButton.setEnabled(false);
+			this.changePaymentButton.setEnabled(false);
+			eticket = null;
+			current = null;
+			newregthread = new Thread(new Webcamcatcher(this));
+			newregthread.start();
+		}
+		catch(Exception e){
+			JOptionPane.showMessageDialog(this, "Error while scanning code.");
+		}
 	}
 	
 	/**
@@ -421,12 +445,15 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 						// TODO: remove printout when debugging finished
 						System.out.println("Registrant has already paid");
 						if(!current.hasCheckedIn()){
-							doCheckinAndTicket();
+							doCheckin();
 							beep(1);
 						} else
 							beep(3);
-						this.changePaymentButton.setEnabled(true);
-						this.changePaymentButton.setText("Print ticket");
+						// only enable payment button, if app has enabled payment options
+						
+						if(paymentOptions)
+							this.changePaymentButton.setEnabled(true);
+						this.changePaymentButton.setText("Open ticket");
 					} else {
 						// Only enable button that the changes payment
 						// TODO: remove printout when debugging finished
@@ -455,19 +482,19 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 				System.out.printf("Fetch full information for registrant %d\n", eticket.getRegistrantID());
 				try{
 					this.indicoConnection.fetchFullRegistrantInformation(current);
-					if(current.hasPaid()){
+					if( current.hasPaid()){
 						// if the registrant has already payed, checkin and generate ticket
-						// in case the user has checked in, rename the button as Print ticket
+						// in case the user has checked in, rename the button as Open ticket
 						// TODO: remove printout when debugging finished
 						System.out.println("Registrant has already paid");
 						if(!current.hasCheckedIn()){
 							// checkin the user
 							beep(1);
-							doCheckinAndTicket();
+							doCheckin();
 						} else {
 							// User checked in - generate ticket
 							beep(3);
-							changePaymentButton.setText("Print ticket");
+							changePaymentButton.setText("Open ticket");
 							this.changePaymentButton.setEnabled(true);
 						}
 					} else {
@@ -479,36 +506,62 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 						this.changePaymentButton.setEnabled(true);
 					}
 					this.infopanel.UpdateRegistrantData(current);
-				} catch (RegistrantBuilderException e){
+				} catch (Exception e){
 					// Failed reading registrant
-					beep(3);
+					JOptionPane.showMessageDialog(this, "Invalid information");
+					beep(4);
 				}
 			} else {
 				// ETicket read successfully, but registrant not found
 				JOptionPane.showMessageDialog(this, "Invalid information");
-				beep(3);
+				beep(4);
 			}
 		} else {
 			// invalid e-ticket
 			JOptionPane.showMessageDialog(this, "Invalid information");
-			beep(3);
+			beep(4);
 		}
 	}
 	
 	/**
 	 * Checkin
 	 */
+	public void doCheckin(){
+		try {
+			System.out.println("trying to checkin");
+			boolean status = true ;//indicoConnection.pushCheckin(current);
+			if(status){
+				System.out.println("checked in successfully");
+				// checkin successfull
+				infopanel.UpdateRegistrantDisplay();
+			} else {
+				System.out.println("checkin failed");
+				beep(3);
+			}
+		} catch (Exception e) {
+			System.out.println("exception during checkin");
+			beep(3);
+		}
+	}
+	
+	/**
+	 * Checkin and ticket generation
+	 */
 	public void doCheckinAndTicket(){
 		try {
-			boolean status = indicoConnection.pushCheckin(current);
+			System.out.println("trying to checkin");
+			boolean status = true;//indicoConnection.pushCheckin(current);
 			if(status){
+				System.out.println("checked in successfully");
 				// checkin successfull
 				infopanel.UpdateRegistrantDisplay();
 				handleGenerateTicket();
 			} else {
+				System.out.println("checkin failed");
 				beep(3);
 			}
-		} catch (IndicoPostException e) {
+		} catch (Exception e) {
+			System.out.println("exception during checkin");
 			beep(3);
 		}
 	}
@@ -543,10 +596,24 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 	public void handleGenerateTicket(){
 		pdfExporter.setRegistrant(current);
 		if( pdfExporter.exportPdf()){
-			if( !pdfExporter.printPdf()){
+		//	if( !pdfExporter.printPdf()){
 				pdfExporter.openPdf();
-			}
+		//	}
 		}
+		else{
+			
+
+			JOptionPane.showMessageDialog(this, "Generation of ticket failed!");
+		}
+		
+	}
+
+	/**
+	 * User pressed print all:
+	 * generate and print pdfs for all registrants
+	 */
+	public void handlePrintAll(){
+		pdfExporter.printAll(registrants, this.indicoConnection, false, true);
 		
 	}
 	
