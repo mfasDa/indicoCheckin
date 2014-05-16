@@ -18,6 +18,7 @@
 package indico.checkin.core.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -114,6 +115,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		this.setLayout(new BorderLayout());
 		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		this.addWindowListener(this);
+		this.setPreferredSize(new Dimension(800, 330));
 		
 		infopanel = new InfoPanel(this);
 		
