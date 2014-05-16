@@ -41,7 +41,7 @@ public class Webcamcatcher implements Runnable {
 	public void run() {
 		// run scheduled task to capture a webcam image and to read the barcode
 		System.out.println("Thread run called");
-		long timeMax = 10000;
+		long timeMax = 20000;
 		Timer timer = new Timer();
 		//parent.getInfoPanel().getWebcamPanel().getWebcam().open();
 		WebcamProcessor processor = new WebcamProcessor(this, parent.getInfoPanel().getWebcamPanel(), System.currentTimeMillis(), timeMax, timer);
