@@ -249,6 +249,24 @@ public class IndicoRegistrant {
 		if(fullInformation != null) return fullInformation.getFullPrice();
 		return 0.;
 	}
+	
+	public String getAmountPaid(){
+		/*
+		 * Get the total price for a registrant
+		 */
+
+		if(fullInformation == null)return "0.00";
+		DecimalFormat f = new DecimalFormat("#0.00");
+		
+		if(fullInformation.findGroupByTitle("Payment Information") != null ){
+			if(fullInformation.findGroupByTitle("Payment Information").findFieldByCaption("Amount Paid")!=null){
+				return fullInformation.findGroupByTitle("Payment Information").findFieldByCaption("Amount Paid").getValue();
+			}
+		}
+		if(hasPaid()) return f.format(fullInformation.getAmountPaid());
+		return "0.00";
+		
+	}
 
 	public double getFee(){
 		if(fullInformation != null) return fullInformation.getAmountPaid();
