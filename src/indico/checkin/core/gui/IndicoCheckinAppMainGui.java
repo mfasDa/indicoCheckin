@@ -120,7 +120,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		this.setLayout(new BorderLayout());
 		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		this.addWindowListener(this);
-		this.setPreferredSize(new Dimension(800, 330));
+		//this.setPreferredSize(new Dimension(800, 330));
 		
 		infopanel = new InfoPanel(this);
 		
