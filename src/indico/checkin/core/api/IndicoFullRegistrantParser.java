@@ -47,6 +47,9 @@ public class IndicoFullRegistrantParser {
 	 * @throws ParseException
 	 */
 	public IndicoRegistrantFullInformation parseRegistrant(String jsonstring) throws ParseException {
+		System.out.println(jsonstring);
+		
+		
 		IndicoRegistrantFullInformation registrant = null;
 		JSONParser parser = new JSONParser();
 		JSONObject parsedRegistrant = (JSONObject)parser.parse(jsonstring);
