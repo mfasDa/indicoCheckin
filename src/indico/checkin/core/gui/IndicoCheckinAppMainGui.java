@@ -93,6 +93,8 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		} 
+
+		this.paymentOptions = paymentOptions;
 		this.getContentPane().setLayout(null);
 		this.initWindow();
 		
@@ -100,7 +102,6 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		current = null;
 		indicoConnection = new IndicoAPIConnector();
 		newregthread = null;
-		this.paymentOptions = paymentOptions;
 		
 		pdfExporter.setReplace(false);
 		
@@ -115,7 +116,10 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 	 * Create main window
 	 */
 	protected void initWindow(){
-		this.setTitle("Indico checkin");
+		if(paymentOptions)
+			this.setTitle("Indico checkin PAYMENT ENABLED");
+		else
+			this.setTitle("Indico checkin");
 		this.setLayout(new BorderLayout());
 		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		this.addWindowListener(this);
@@ -140,22 +144,22 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		this.apiinfobutton.setActionCommand("apiinfo");
 		this.apiinfobutton.addActionListener(this);
 		this.apiinfobutton.setEnabled(false);
-		//GridBagConstraints abcs = new GridBagConstraints();
-		//abcs.fill = GridBagConstraints.HORIZONTAL;
-		//abcs.gridx = 1;
-		//abcs.gridy = 0;
-		//userButtonPanel.add(this.apiinfobutton, abcs);
+		GridBagConstraints abcs = new GridBagConstraints();
+		abcs.fill = GridBagConstraints.HORIZONTAL;
+		abcs.gridx = 1;
+		abcs.gridy = 0;
+		userButtonPanel.add(this.apiinfobutton, abcs);
 		
 		
 		this.printAllButton = new JButton("print all");
 		this.printAllButton.setActionCommand("printAll");
 		this.printAllButton.addActionListener(this);
 		this.printAllButton.setEnabled(false);
-		GridBagConstraints abcs = new GridBagConstraints();
-		abcs.fill = GridBagConstraints.HORIZONTAL;
-		abcs.gridx = 1;
-		abcs.gridy = 0;
-		userButtonPanel.add(this.printAllButton, abcs);
+		//GridBagConstraints abcs = new GridBagConstraints();
+		//abcs.fill = GridBagConstraints.HORIZONTAL;
+		//abcs.gridx = 1;
+		//abcs.gridy = 0;
+		//userButtonPanel.add(this.printAllButton, abcs);
 		
 		JButton searchWebcamButton = new JButton("Select Webcam");
 		searchWebcamButton.setActionCommand("searchWebcam");
@@ -442,22 +446,24 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 						// if the registrant has already payed checkin
 						// TODO: remove printout when debugging finished
 						System.out.println("Registrant has already paid");
-						if(!current.hasCheckedIn()){
+						if(current.hasCheckedIn()){
+							beep(3);
+							JOptionPane.showMessageDialog(this, String.format("Already checked in!"));
+							this.changePaymentButton.setEnabled(true);
+							this.changePaymentButton.setText("Open ticket");
+						} else{
 							doCheckin();
 							beep(1);
-						} else
-							beep(3);
-						// only enable payment button, if app has enabled payment options
-						
-						if(paymentOptions)
-							this.changePaymentButton.setEnabled(true);
-						this.changePaymentButton.setText("Open ticket");
+						}
 					} else {
 						// Only enable button that the changes payment
 						// TODO: remove printout when debugging finished
 						beep(2);
 						System.out.println("Registrant did not yet pay");
-						this.changePaymentButton.setEnabled(true);
+						JOptionPane.showMessageDialog(this, String.format("Registrant did not yet pay"));
+						// only enable payment button, if app has enabled payment options
+						if(paymentOptions)
+							this.changePaymentButton.setEnabled(true);
 						this.changePaymentButton.setText("Pay");
 					}
 
@@ -485,23 +491,26 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 						// in case the user has checked in, rename the button as Open ticket
 						// TODO: remove printout when debugging finished
 						System.out.println("Registrant has already paid");
-						if(!current.hasCheckedIn()){
+						if(current.hasCheckedIn()){
+							// User checked in - generate ticket
+							beep(3);
+							JOptionPane.showMessageDialog(this, String.format("Already checked in"));
+							changePaymentButton.setText("Open ticket");
+							this.changePaymentButton.setEnabled(true);
+						} else {
 							// checkin the user
 							beep(1);
 							doCheckin();
-						} else {
-							// User checked in - generate ticket
-							beep(3);
-							changePaymentButton.setText("Open ticket");
-							this.changePaymentButton.setEnabled(true);
 						}
 					} else {
 						// Only enable button that the changes payment
 						// TODO: remove printout when debugging finished
 						System.out.println("Registrant did not yet pay");
 						beep(2);
+						JOptionPane.showMessageDialog(this, String.format("Registrant did not yet pay"));
 						this.changePaymentButton.setText("Pay");
-						this.changePaymentButton.setEnabled(true);
+						if(paymentOptions)
+							this.changePaymentButton.setEnabled(true);
 					}
 					this.infopanel.UpdateRegistrantData(current);
 				} catch (Exception e){
@@ -511,13 +520,13 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 				}
 			} else {
 				// ETicket read successfully, but registrant not found
-				JOptionPane.showMessageDialog(this, "Invalid information");
 				beep(4);
+				JOptionPane.showMessageDialog(this, "Invalid information");
 			}
 		} else {
 			// invalid e-ticket
-			JOptionPane.showMessageDialog(this, "Invalid information");
 			beep(4);
+			JOptionPane.showMessageDialog(this, "Invalid information");
 		}
 	}
 	
@@ -527,7 +536,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 	public void doCheckin(){
 		try {
 			System.out.println("trying to checkin");
-			boolean status = true ;//indicoConnection.pushCheckin(current);
+			boolean status = indicoConnection.pushCheckin(current);
 			if(status){
 				System.out.println("checked in successfully");
 				// checkin successfull
@@ -548,7 +557,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 	public void doCheckinAndTicket(){
 		try {
 			System.out.println("trying to checkin");
-			boolean status = true;//indicoConnection.pushCheckin(current);
+			boolean status = indicoConnection.pushCheckin(current);
 			if(status){
 				System.out.println("checked in successfully");
 				// checkin successfull
