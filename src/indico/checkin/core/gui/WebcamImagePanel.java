@@ -48,6 +48,7 @@ public class WebcamImagePanel extends JPanel {
 	
 	public WebcamImagePanel(Webcam wc){
 		webcam = wc;
+		webcam.setViewSize(new Dimension(640,480));
 		this.setPreferredSize(webcam.getViewSize());
 	}
 	public void SetWebcam(Webcam webcam){

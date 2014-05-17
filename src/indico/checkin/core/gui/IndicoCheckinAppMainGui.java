@@ -18,7 +18,7 @@
 package indico.checkin.core.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
+//import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -104,7 +104,7 @@ public class IndicoCheckinAppMainGui extends JFrame implements ActionListener, W
 		indicoConnection = new IndicoAPIConnector();
 		newregthread = null;
 		
-		pdfExporter.setReplace(false);
+		pdfExporter.setReplace(true);
 		
 		isLoggedIn = false;
 		hasWebcam = Webcam.getWebcams().size() > 0;

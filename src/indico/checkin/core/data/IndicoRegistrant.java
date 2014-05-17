@@ -208,7 +208,7 @@ public class IndicoRegistrant {
 		if(socialEvent.equals("Mathildenhöhe")) return "Mathildenhöhe (museum or tower)";
 		else{
 			double price = socialEvents.get(0).getPrice() * getExcursionPersons();
-			return socialEvent + " (" + f.format(price) +" €)";
+			return socialEvent + " (" + f.format(price) +"€  )";
 		}
 		
 	}
