@@ -64,8 +64,8 @@ public class InfoPanel extends JPanel implements ListSelectionListener{
 		tablemodel = new RegistrantInfoDisplayModel();
 		userdata = new JTable(tablemodel);
 		userdata.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		userdata.getColumnModel().getColumn(0).setPreferredWidth(240);
-		userdata.getColumnModel().getColumn(1).setPreferredWidth(480);	
+		userdata.getColumnModel().getColumn(0).setPreferredWidth(280);
+		userdata.getColumnModel().getColumn(1).setPreferredWidth(440);	
 		userdata.setRowHeight(36);
 		userdata.setDefaultRenderer(Object.class, new RegistrantInfoRenderer());
 		userdata.getSelectionModel().addListSelectionListener(this);
